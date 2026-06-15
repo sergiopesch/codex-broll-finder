@@ -1,0 +1,39 @@
+{
+  "name": "codex-broll-finder",
+  "version": "0.1.0",
+  "description": "Codex-native skill and helper workflow for planning, rendering, exporting, and validating b-roll edits.",
+  "author": {
+    "name": "Sergio Pesch",
+    "url": "https://github.com/sergiopesch"
+  },
+  "homepage": "https://github.com/sergiopesch/codex-broll-finder",
+  "repository": "https://github.com/sergiopesch/codex-broll-finder",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "video-editing",
+    "b-roll",
+    "ffmpeg",
+    "social-video"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Codex B-Roll Finder",
+    "shortDescription": "Plan, render, export, and validate b-roll edits.",
+    "longDescription": "A Codex-native video editing workflow for talking-head b-roll: plan beats, source objective assets, maintain manifests, render cutaways, export social variants, and produce validation reports.",
+    "developerName": "Sergio Pesch",
+    "category": "Creativity",
+    "capabilities": [
+      "Video editing",
+      "Export validation",
+      "Structured manifests"
+    ],
+    "websiteURL": "https://github.com/sergiopesch/codex-broll-finder",
+    "brandColor": "#2563EB",
+    "defaultPrompt": [
+      "Find b-roll for this video.",
+      "Validate this b-roll export.",
+      "Create social export variants."
+    ]
+  }
+}

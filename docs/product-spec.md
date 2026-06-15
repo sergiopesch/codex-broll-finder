@@ -531,12 +531,13 @@ Current:
 - `capture-page`
 - `render-cutaways`
 - `verify-frames`
-
-Next:
-
+- `list-presets`
 - `probe-media`
 - `validate-export`
 - `export-variant`
+
+Next:
+
 - `render-captions`
 - `check-safe-zones`
 - `analyze-audio`
@@ -593,6 +594,15 @@ Done when:
 - verification frames are extracted
 - export presets validate
 
+Current implementation status:
+
+- export presets exist for 9:16, 1:1, 4:5, and 16:9 social/web variants
+- `ffprobe` media probing is implemented
+- export validation writes JSON and Markdown reports
+- strict export validation exists for release gates
+- repo-local plugin scaffold exists at `plugins/codex-broll-finder/`
+- real ffmpeg smoke test covers export, probe, and validation on a tiny generated video
+
 ### Phase 2: Social Editing Core
 
 Done when:
@@ -610,6 +620,12 @@ Done when:
 - local marketplace install works
 - install docs are tested
 - plugin can be shared through a Codex marketplace source
+
+Current implementation status:
+
+- `.codex-plugin/plugin.json` exists under `plugins/codex-broll-finder/`
+- the active skill and helper source are mirrored into the plugin scaffold for validation
+- marketplace install and release metadata remain future work
 
 ### Phase 4: Professional Editing Loop
 

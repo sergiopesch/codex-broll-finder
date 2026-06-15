@@ -4,6 +4,8 @@ Build `codex-broll-finder` into an open-source Codex-native video editing system
 
 The controlling specification is [product-spec.md](./product-spec.md).
 
+The active implementation target is [phase-1-build-goal.md](./phase-1-build-goal.md).
+
 ## Product Thesis
 
 Video editing with Codex should not imitate a timeline UI. It should let a creator describe editorial intent, inspect structured plans, approve taste decisions, and receive a technically correct edit with manifests, reproducible renders, and visual/audio verification.
