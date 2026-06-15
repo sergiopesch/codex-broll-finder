@@ -55,7 +55,7 @@ Current automated checks:
 - H.264 video codec
 - progressive scan
 - square pixels
-- yuv420p pixel format warning
+- yuv420p pixel format
 - minimum frame rate for social presets
 - AAC audio codec, if audio exists
 - 48 kHz audio sample rate, if audio exists
