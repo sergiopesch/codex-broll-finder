@@ -101,7 +101,7 @@ def test_below_minimum_social_frame_rate_fails():
     assert any(check.name == "frame_rate" and check.status == "fail" for check in report.checks)
 
 
-def test_non_420_pixel_format_warns():
+def test_non_420_pixel_format_fails():
     probe = valid_probe()
     bad_probe = MediaProbe(
         path=probe.path,
@@ -116,8 +116,46 @@ def test_non_420_pixel_format_warns():
 
     report = validate_export(bad_probe, get_preset("vertical-social"))
 
-    assert report.overall == "warning"
-    assert any(check.name == "pixel_format" and check.status == "warning" for check in report.checks)
+    assert report.overall == "fail"
+    assert any(check.name == "pixel_format" and check.status == "fail" for check in report.checks)
+
+
+def test_audio_codec_mismatch_fails():
+    probe = valid_probe()
+    bad_probe = MediaProbe(
+        path=probe.path,
+        format_name=probe.format_name,
+        format_tags=probe.format_tags,
+        duration=probe.duration,
+        bit_rate=probe.bit_rate,
+        size_bytes=probe.size_bytes,
+        video=probe.video,
+        audio=AudioStream("mp3", 48000, 2, "stereo"),
+    )
+
+    report = validate_export(bad_probe, get_preset("vertical-social"))
+
+    assert report.overall == "fail"
+    assert any(check.name == "audio_codec" and check.status == "fail" for check in report.checks)
+
+
+def test_audio_sample_rate_mismatch_fails():
+    probe = valid_probe()
+    bad_probe = MediaProbe(
+        path=probe.path,
+        format_name=probe.format_name,
+        format_tags=probe.format_tags,
+        duration=probe.duration,
+        bit_rate=probe.bit_rate,
+        size_bytes=probe.size_bytes,
+        video=probe.video,
+        audio=AudioStream("aac", 44100, 2, "stereo"),
+    )
+
+    report = validate_export(bad_probe, get_preset("vertical-social"))
+
+    assert report.overall == "fail"
+    assert any(check.name == "audio_sample_rate" and check.status == "fail" for check in report.checks)
 
 
 def test_markdown_report_shape(tmp_path):

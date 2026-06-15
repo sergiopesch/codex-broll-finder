@@ -6,6 +6,9 @@ from .presets import ExportPreset
 
 
 def build_export_command(input_path: Path, output_path: Path, preset: ExportPreset, *, crf: int = 18) -> list[str]:
+    if preset.container == "mp4" and output_path.suffix.lower() != ".mp4":
+        raise ValueError(f"{preset.name} exports must use an .mp4 output path")
+
     filters = []
     if preset.min_fps is not None:
         filters.append(f"fps={int(preset.min_fps)}")

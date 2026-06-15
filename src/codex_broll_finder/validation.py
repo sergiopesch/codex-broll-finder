@@ -149,7 +149,6 @@ def _checks(probe: MediaProbe, preset: ExportPreset) -> list[ValidationCheck]:
                 str(audio.codec_name),
                 "Audio codec matches preset.",
                 "Audio codec should be AAC for MP4 social exports.",
-                warning=True,
             )
         )
         checks.append(
@@ -160,7 +159,6 @@ def _checks(probe: MediaProbe, preset: ExportPreset) -> list[ValidationCheck]:
                 f"{audio.sample_rate} Hz",
                 "Audio sample rate matches preset.",
                 "Audio sample rate should be 48 kHz.",
-                warning=True,
             )
         )
 
@@ -255,7 +253,7 @@ def _pixel_format_check(pix_fmt: str | None) -> ValidationCheck:
         )
     return ValidationCheck(
         "pixel_format",
-        "warning",
+        "fail",
         "yuv420p",
         pix_fmt,
         "Use yuv420p for broad social/web compatibility.",
