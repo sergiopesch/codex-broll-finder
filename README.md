@@ -36,6 +36,15 @@ This is the starter scaffold. The first usable slice is the manifest-driven rend
 4. render with `render-cutaways`
 5. extract inspection frames with `verify-frames`
 
+## Product Direction
+
+The project goal and full product specification live in:
+
+- [docs/goal.md](docs/goal.md)
+- [docs/product-spec.md](docs/product-spec.md)
+
+Short version: keep iterating as a Codex skill while the workflow is changing, then package it as a Codex plugin once it is stable enough for marketplace-style installation.
+
 ## Attribution
 
 Adapted from the MIT-licensed [`louisedesadeleer/b-roll-finder`](https://github.com/louisedesadeleer/b-roll-finder) methodology and helper scripts.
