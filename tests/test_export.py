@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from codex_broll_finder.export import build_export_command
-from codex_broll_finder.presets import get_preset
+from kino.export import build_export_command
+from kino.presets import get_preset
 
 
 def test_build_export_command_uses_preset_dimensions_and_faststart():

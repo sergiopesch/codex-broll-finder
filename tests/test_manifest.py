@@ -2,11 +2,11 @@ import json
 
 import pytest
 
-from codex_broll_finder.manifest import ManifestError, load_manifest
+from kino.manifest import ManifestError, load_manifest
 
 
 def write_manifest(tmp_path, beats):
-    path = tmp_path / "BROLL-MANIFEST.json"
+    path = tmp_path / "KINO-MANIFEST.json"
     path.write_text(
         json.dumps(
             {

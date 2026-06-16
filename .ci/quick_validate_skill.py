@@ -13,8 +13,8 @@ VALIDATOR = Path.home() / ".codex" / "skills" / ".system" / "skill-creator" / "s
 
 def main() -> int:
     if not VALIDATOR.exists():
-        return validate_skill(ROOT / "broll-finder")
-    return subprocess.call([sys.executable, str(VALIDATOR), str(ROOT / "broll-finder")])
+        return validate_skill(ROOT / "kino")
+    return subprocess.call([sys.executable, str(VALIDATOR), str(ROOT / "kino")])
 
 
 def validate_skill(skill_root: Path) -> int:

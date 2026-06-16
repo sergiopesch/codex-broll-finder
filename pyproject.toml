@@ -3,16 +3,16 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "codex-broll-finder"
+name = "kino"
 version = "0.1.0"
-description = "Codex-native skill and helpers for b-roll sourcing and rendering."
+description = "Codex-native video edit engine and helper workflow."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [
   { name = "Sergio Pesch" },
 ]
-keywords = ["codex", "video-editing", "b-roll", "ffmpeg"]
+keywords = ["codex", "video-editing", "edit-engine", "ffmpeg"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "License :: OSI Approved :: MIT License",
@@ -25,9 +25,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/sergiopesch/codex-broll-finder"
-Repository = "https://github.com/sergiopesch/codex-broll-finder"
-Issues = "https://github.com/sergiopesch/codex-broll-finder/issues"
+Homepage = "https://github.com/sergiopesch/kino"
+Repository = "https://github.com/sergiopesch/kino"
+Issues = "https://github.com/sergiopesch/kino/issues"
 
 [project.optional-dependencies]
 dev = [
@@ -37,7 +37,7 @@ dev = [
 ]
 
 [project.scripts]
-broll-tool = "codex_broll_finder.cli:main"
+kino = "kino.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

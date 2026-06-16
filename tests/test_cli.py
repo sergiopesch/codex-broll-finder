@@ -1,5 +1,5 @@
-from codex_broll_finder import cli
-from codex_broll_finder.probe import AudioStream, MediaProbe, VideoStream
+from kino import cli
+from kino.probe import AudioStream, MediaProbe, VideoStream
 
 
 def _probe() -> MediaProbe:
@@ -16,7 +16,7 @@ def _probe() -> MediaProbe:
 
 
 def test_validate_export_allows_manual_review_by_default(monkeypatch, capsys):
-    from codex_broll_finder import probe
+    from kino import probe
 
     monkeypatch.setattr(probe, "probe_media", lambda _: _probe())
 
@@ -25,7 +25,7 @@ def test_validate_export_allows_manual_review_by_default(monkeypatch, capsys):
 
 
 def test_validate_export_strict_fails_manual_review(monkeypatch):
-    from codex_broll_finder import probe
+    from kino import probe
 
     monkeypatch.setattr(probe, "probe_media", lambda _: _probe())
 

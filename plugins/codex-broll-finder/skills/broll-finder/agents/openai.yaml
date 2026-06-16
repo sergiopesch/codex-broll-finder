@@ -1,4 +1,0 @@
-interface:
-  display_name: "B-Roll Finder"
-  short_description: "Source and place accurate b-roll for talking-head edits."
-  default_prompt: "Find b-roll for this video using my taste profile and return a plan before sourcing."

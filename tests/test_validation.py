@@ -1,8 +1,8 @@
 from pathlib import Path
 
-from codex_broll_finder.presets import get_preset
-from codex_broll_finder.probe import AudioStream, MediaProbe, VideoStream
-from codex_broll_finder.validation import validate_export
+from kino.presets import get_preset
+from kino.probe import AudioStream, MediaProbe, VideoStream
+from kino.validation import validate_export
 
 
 def valid_probe() -> MediaProbe:
@@ -159,15 +159,15 @@ def test_audio_sample_rate_mismatch_fails():
 
 
 def test_markdown_report_shape(tmp_path):
-    from codex_broll_finder.validation import write_markdown_report
+    from kino.validation import write_markdown_report
 
     out = write_markdown_report(validate_export(valid_probe(), get_preset("vertical-social")), tmp_path / "report.md")
 
-    assert Path(out).read_text().startswith("# B-Roll Validation Report")
+    assert Path(out).read_text().startswith("# Kino Validation Report")
 
 
 def test_markdown_report_escapes_table_cells(tmp_path):
-    from codex_broll_finder.validation import ValidationCheck, ValidationReport, write_markdown_report
+    from kino.validation import ValidationCheck, ValidationReport, write_markdown_report
 
     report = ValidationReport(
         preset={"name": "vertical-social"},

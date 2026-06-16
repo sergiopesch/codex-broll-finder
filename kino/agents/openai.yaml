@@ -1,0 +1,4 @@
+interface:
+  display_name: "Kino"
+  short_description: "Plan, render, export, and validate structured video edits."
+  default_prompt: "Create a Kino edit plan for this video and verify the result before delivery."

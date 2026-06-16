@@ -1,6 +1,6 @@
 # Source Repo Review
 
-Reviewed repo: `https://github.com/louisedesadeleer/b-roll-finder.git`
+Reviewed repo: upstream `b-roll-finder`
 Commit inspected: `36b8a56`
 
 ## What It Is
@@ -21,7 +21,7 @@ The upstream repo is a methodology skill, not an application. Its core value is 
 ## Gaps In The Upstream Shape
 
 - `SKILL.md` is long and mixes core workflow, edge cases, source policy, ffmpeg recipes, and personal anecdotes.
-- `TASTE.md` ships as a confirmed personal profile for Louise, which is useful as an example but not as a generic default.
+- `TASTE.md` ships as a confirmed personal profile, which is useful as an example but not as a generic default.
 - The helper scripts are prototypes: hardcoded macOS Chrome path, manual constants, no argument validation, no packaging, no tests.
 - Render state is described in prose but not represented as a machine-validated manifest.
 - Contact-sheet behavior conflicts slightly with the newer lean-path rule.
@@ -33,7 +33,7 @@ The Codex version should be a skill plus tools:
 
 - small `SKILL.md` for trigger-time behavior
 - detailed references loaded only as needed
-- structured `BROLL-PROFILE.md` and `BROLL-MANIFEST.json`
+- structured `KINO-PROFILE.md` and `KINO-MANIFEST.json`
 - portable Python CLI wrappers around fragile media operations
 - tests for parsing, validation, and generated ffmpeg command shape
 - explicit attribution to the MIT upstream

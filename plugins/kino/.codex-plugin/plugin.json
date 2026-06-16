@@ -1,0 +1,39 @@
+{
+  "name": "kino",
+  "version": "0.1.0",
+  "description": "Codex-native video edit engine and helper workflow.",
+  "author": {
+    "name": "Sergio Pesch",
+    "url": "https://github.com/sergiopesch"
+  },
+  "homepage": "https://github.com/sergiopesch/kino",
+  "repository": "https://github.com/sergiopesch/kino",
+  "license": "MIT",
+  "keywords": [
+    "codex",
+    "video-editing",
+    "b-roll",
+    "ffmpeg",
+    "social-video"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Kino",
+    "shortDescription": "Plan, render, export, and validate structured video edits.",
+    "longDescription": "A Codex-native video edit engine: plan beats, source objective assets, maintain manifests, render cutaways, export social variants, and produce validation reports.",
+    "developerName": "Sergio Pesch",
+    "category": "Creativity",
+    "capabilities": [
+      "Video editing",
+      "Export validation",
+      "Structured manifests"
+    ],
+    "websiteURL": "https://github.com/sergiopesch/kino",
+    "brandColor": "#2563EB",
+    "defaultPrompt": [
+      "Create a Kino edit plan for this video.",
+      "Validate this Kino export.",
+      "Create social export variants."
+    ]
+  }
+}

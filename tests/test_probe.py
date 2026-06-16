@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from codex_broll_finder.probe import parse_ffprobe_json, parse_frame_rate
+from kino.probe import parse_ffprobe_json, parse_frame_rate
 
 
 def test_parse_frame_rate():

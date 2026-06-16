@@ -1,4 +1,4 @@
-from codex_broll_finder.presets import get_preset, preset_names
+from kino.presets import get_preset, preset_names
 
 
 def test_social_presets_are_available():

@@ -1,6 +1,6 @@
 # Goal
 
-Build `codex-broll-finder` into an open-source Codex-native video editing system: first as a high-quality reusable skill, then as an installable Codex plugin once the workflow, tools, validation, and documentation are stable.
+Build `kino` into an open-source Codex-native video editing system: first as a high-quality reusable skill, then as an installable Codex plugin once the workflow, tools, validation, and documentation are stable.
 
 The controlling specification is [product-spec.md](./product-spec.md).
 

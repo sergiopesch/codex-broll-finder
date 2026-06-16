@@ -1,10 +1,10 @@
-# Codex B-Roll Finder Product Specification
+# Kino Product Specification
 
 Last updated: 2026-06-15
 
 ## 1. Executive Summary
 
-`codex-broll-finder` should become an open-source Codex-native video editing system. The initial product is a b-roll specialist for talking-head edits. The expanded product is a reproducible editing layer where Codex can plan, source, assemble, validate, and export professional video edits without relying on a GUI timeline.
+Kino should become an open-source Codex-native video editing system. The initial product is a cutaway specialist for talking-head edits. The expanded product is a reproducible editing layer where Codex can plan, source, assemble, validate, and export professional video edits without relying on a GUI timeline.
 
 The system should learn from the quality bar of Final Cut Pro, DaVinci Resolve, Premiere Pro, After Effects, CapCut, Descript, and Runway, but it should not clone their interfaces. The differentiator is agentic editing: structured intent, source-aware assets, manifests, deterministic renders, and verifiable outputs.
 
@@ -42,7 +42,7 @@ Do not package a public plugin until:
 
 ## 4. User Workflows
 
-### 4.1 B-Roll Edit
+### 4.1 Kino Cutaway Edit
 
 Input:
 
@@ -64,8 +64,8 @@ Flow:
 Output:
 
 - edited video
-- `BROLL-MANIFEST.json`
-- `BROLL-MANIFEST.md`
+- `KINO-MANIFEST.json`
+- `KINO-MANIFEST.md`
 - verification frames
 - source/license notes
 
@@ -98,7 +98,7 @@ Output:
 
 ### 5.1 Skill Layer
 
-Location: `broll-finder/SKILL.md`
+Location: `kino/SKILL.md`
 
 Responsibilities:
 
@@ -109,7 +109,7 @@ Responsibilities:
 
 ### 5.2 Reference Layer
 
-Location: `broll-finder/references/`
+Location: `kino/references/`
 
 Responsibilities:
 
@@ -122,7 +122,7 @@ Responsibilities:
 
 ### 5.3 Tooling Layer
 
-Location: `src/codex_broll_finder/`
+Location: `src/kino/`
 
 Responsibilities:
 
@@ -139,9 +139,9 @@ Responsibilities:
 Target:
 
 ```text
-plugins/codex-broll-finder/
+plugins/kino/
 ├── .codex-plugin/plugin.json
-├── skills/broll-finder/
+├── skills/kino/
 ├── assets/
 ├── scripts/
 └── marketplace metadata
@@ -500,7 +500,7 @@ Each release must include a sample command that:
 
 ## 11. Validation Report
 
-Every render should produce `BROLL-VALIDATION.json` and `BROLL-VALIDATION.md`.
+Every render should produce `KINO-VALIDATION.json` and `KINO-VALIDATION.md`.
 
 Required fields:
 
@@ -585,7 +585,7 @@ Done when:
 - basic CLI works
 - product spec exists
 
-### Phase 1: B-Roll MVP
+### Phase 1: Kino Cutaway MVP
 
 Done when:
 
@@ -600,7 +600,7 @@ Current implementation status:
 - `ffprobe` media probing is implemented
 - export validation writes JSON and Markdown reports
 - strict export validation exists for release gates
-- repo-local plugin scaffold exists at `plugins/codex-broll-finder/`
+- repo-local plugin scaffold exists at `plugins/kino/`
 - real ffmpeg smoke test covers export, probe, and validation on a tiny generated video
 
 ### Phase 2: Social Editing Core
@@ -623,7 +623,7 @@ Done when:
 
 Current implementation status:
 
-- `.codex-plugin/plugin.json` exists under `plugins/codex-broll-finder/`
+- `.codex-plugin/plugin.json` exists under `plugins/kino/`
 - the active skill and helper source are mirrored into the plugin scaffold for validation
 - marketplace install and release metadata remain future work
 

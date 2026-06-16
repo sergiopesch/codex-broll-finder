@@ -5,10 +5,10 @@ import subprocess
 
 import pytest
 
-from codex_broll_finder.export import build_export_command
-from codex_broll_finder.presets import get_preset
-from codex_broll_finder.probe import probe_media
-from codex_broll_finder.validation import validate_export, write_json_report, write_markdown_report
+from kino.export import build_export_command
+from kino.presets import get_preset
+from kino.probe import probe_media
+from kino.validation import validate_export, write_json_report, write_markdown_report
 
 
 pytestmark = pytest.mark.skipif(
@@ -20,8 +20,8 @@ pytestmark = pytest.mark.skipif(
 def test_export_probe_validate_real_tiny_video(tmp_path):
     source = tmp_path / "source.mp4"
     exported = tmp_path / "vertical.mp4"
-    json_report = tmp_path / "BROLL-VALIDATION.json"
-    md_report = tmp_path / "BROLL-VALIDATION.md"
+    json_report = tmp_path / "KINO-VALIDATION.json"
+    md_report = tmp_path / "KINO-VALIDATION.md"
 
     subprocess.run(
         [
@@ -57,5 +57,5 @@ def test_export_probe_validate_real_tiny_video(tmp_path):
 
     assert exported.exists()
     assert json_report.exists()
-    assert md_report.read_text().startswith("# B-Roll Validation Report")
+    assert md_report.read_text().startswith("# Kino Validation Report")
     assert report.overall in {"pass", "manual-review-required"}

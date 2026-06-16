@@ -1,7 +1,7 @@
 from pathlib import Path
 
-from codex_broll_finder.manifest import Beat, Manifest
-from codex_broll_finder.video import build_render_command, verification_times, video_filter
+from kino.manifest import Beat, Manifest
+from kino.video import build_render_command, verification_times, video_filter
 
 
 def test_video_filter_is_full_bleed():

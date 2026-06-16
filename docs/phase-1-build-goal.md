@@ -4,7 +4,7 @@ Last updated: 2026-06-15
 
 ## Goal
 
-Build the first usable Codex-native b-roll editing loop: a skill-driven workflow plus deterministic helpers that can render a sample cutaway edit, export social variants, and produce machine-readable validation reports.
+Build the first usable Kino editing loop: a skill-driven workflow plus deterministic helpers that can render a sample cutaway edit, export social variants, and produce machine-readable validation reports.
 
 This goal implements the Phase 1 slice of [product-spec.md](./product-spec.md). The plugin scaffold exists to keep packaging pressure visible, but public plugin release remains Phase 3 until install, marketplace, and sample-project criteria pass.
 
@@ -44,11 +44,11 @@ Parallel review goals:
 The Phase 1 build is acceptable when:
 
 - `pip install -e ".[dev]"` works in a clean virtualenv.
-- `broll-tool --help` exposes manifest, render, verification, preset, probe, validation, and export commands.
+- `kino --help` exposes manifest, render, verification, preset, probe, validation, and export commands.
 - `pytest` passes, including at least one real ffmpeg smoke test when `ffmpeg` and `ffprobe` are installed.
 - `ruff check .` passes.
 - `.ci/quick_validate_skill.py` validates the root skill using the active interpreter.
-- `plugins/codex-broll-finder` passes plugin manifest validation.
+- `plugins/kino` passes plugin manifest validation.
 - `validate-export --strict` exits nonzero for warnings or manual-review items.
 - Validation reports include concrete checks for container, dimensions, codec, pixel format, scan type, square pixels, frame rate, audio codec/sample rate, and fast-start atom order when the file is available.
 
@@ -63,8 +63,8 @@ pip install -e ".[dev]"
 ruff check .
 pytest
 python .ci/quick_validate_skill.py
-python /path/to/plugin-creator/scripts/validate_plugin.py plugins/codex-broll-finder
-broll-tool --help
+python /path/to/plugin-creator/scripts/validate_plugin.py plugins/kino
+kino --help
 ```
 
 Clean-install smoke:
@@ -73,7 +73,7 @@ Clean-install smoke:
 tmpdir="$(mktemp -d)"
 python3 -m venv "$tmpdir/venv"
 "$tmpdir/venv/bin/python" -m pip install -e ".[dev]"
-"$tmpdir/venv/bin/broll-tool" --help
+"$tmpdir/venv/bin/kino" --help
 "$tmpdir/venv/bin/pytest"
 ```
 
