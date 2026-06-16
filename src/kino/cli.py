@@ -15,6 +15,72 @@ def main(argv: list[str] | None = None) -> int:
     validate = sub.add_parser("validate-manifest", help="Parse and validate KINO-MANIFEST.json")
     validate.add_argument("manifest")
 
+    init_edit = sub.add_parser("init-edit", help="Create KINO-EDIT.json from transcript JSON")
+    init_edit.add_argument("transcript")
+    init_edit.add_argument("output")
+    init_edit.add_argument("--id", dest="edit_id")
+
+    add_source = sub.add_parser("add-source", help="Add a source receipt entry to KINO-EDIT.json")
+    add_source.add_argument("edit")
+    add_source.add_argument("id")
+    add_source.add_argument("kind", choices=["url", "file", "capture", "user", "generated", "other"])
+    add_source.add_argument("locator")
+    add_source.add_argument("--title")
+    add_source.add_argument("--author")
+    add_source.add_argument("--publisher")
+    add_source.add_argument("--license")
+    add_source.add_argument("--captured-at")
+    add_source.add_argument("--notes")
+    add_source.add_argument("--out")
+
+    add_asset = sub.add_parser("add-asset", help="Add an asset candidate entry to KINO-EDIT.json")
+    add_asset.add_argument("edit")
+    add_asset.add_argument("id")
+    add_asset.add_argument("source_id")
+    add_asset.add_argument("kind", choices=["video", "still", "image", "web", "audio", "document", "other"])
+    add_asset.add_argument("uri")
+    add_asset.add_argument("--start", type=float)
+    add_asset.add_argument("--end", type=float)
+    add_asset.add_argument("--width", type=int)
+    add_asset.add_argument("--height", type=int)
+    add_asset.add_argument("--score", type=float)
+    add_asset.add_argument("--credit")
+    add_asset.add_argument("--notes")
+    add_asset.add_argument("--out")
+
+    propose = sub.add_parser("propose-beat", help="Add a proposed beat candidate to KINO-EDIT.json")
+    propose.add_argument("edit")
+    propose.add_argument("id")
+    propose.add_argument("token_start", type=int)
+    propose.add_argument("token_end", type=int)
+    propose.add_argument("--route", required=True)
+    propose.add_argument("--interpretation", required=True)
+    propose.add_argument("--source-plan", required=True)
+    propose.add_argument("--fallback")
+    propose.add_argument("--source-id", action="append", default=[])
+    propose.add_argument("--asset-id", action="append", default=[])
+    propose.add_argument("--out")
+
+    approve = sub.add_parser("approve-beat", help="Approve a proposed beat with a selected asset")
+    approve.add_argument("edit")
+    approve.add_argument("beat_id")
+    approve.add_argument("asset_id")
+    approve.add_argument("--out")
+
+    reject = sub.add_parser("reject-beat", help="Reject a proposed beat while preserving the reason")
+    reject.add_argument("edit")
+    reject.add_argument("beat_id")
+    reject.add_argument("reason")
+    reject.add_argument("--out")
+
+    compile_manifest = sub.add_parser("compile-manifest", help="Compile approved KINO-EDIT beats to KINO-MANIFEST.json")
+    compile_manifest.add_argument("edit")
+    compile_manifest.add_argument("manifest")
+    compile_manifest.add_argument("--base", required=True)
+    compile_manifest.add_argument("--output", default="output_with_kino.mp4")
+    compile_manifest.add_argument("--size", default="1920x1080")
+    compile_manifest.add_argument("--fps", type=int, default=30)
+
     zoom = sub.add_parser("zoom-still", help="Render a smooth sub-pixel still zoom")
     zoom.add_argument("input")
     zoom.add_argument("output")
@@ -64,6 +130,129 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "validate-manifest":
         manifest = load_manifest(args.manifest)
         print(f"ok: {len(manifest.beats)} beats")
+        return 0
+
+    if args.command == "init-edit":
+        from .edit import write_edit_json
+        from .planning import load_edit_from_transcript_json
+
+        edit = load_edit_from_transcript_json(args.transcript, edit_id=args.edit_id)
+        out = write_edit_json(edit, args.output)
+        print(f"done: {out}")
+        return 0
+
+    if args.command == "add-source":
+        from dataclasses import replace
+
+        from .edit import SourceReceipt, load_edit, validate_edit, write_edit_json
+
+        edit = load_edit(args.edit)
+        updated = replace(
+            edit,
+            sources=(
+                *edit.sources,
+                SourceReceipt(
+                    id=args.id,
+                    kind=args.kind,
+                    locator=args.locator,
+                    title=args.title,
+                    author=args.author,
+                    publisher=args.publisher,
+                    license=args.license,
+                    captured_at=args.captured_at,
+                    notes=args.notes,
+                ),
+            ),
+        )
+        validate_edit(updated)
+        out = write_edit_json(updated, _edit_out_path(args.edit, args.out))
+        print(f"done: {out}")
+        return 0
+
+    if args.command == "add-asset":
+        from dataclasses import replace
+
+        from .edit import AssetCandidate, load_edit, validate_edit, write_edit_json
+
+        edit = load_edit(args.edit)
+        updated = replace(
+            edit,
+            assets=(
+                *edit.assets,
+                AssetCandidate(
+                    id=args.id,
+                    source_id=args.source_id,
+                    kind=args.kind,
+                    uri=args.uri,
+                    start=args.start,
+                    end=args.end,
+                    width=args.width,
+                    height=args.height,
+                    score=args.score,
+                    credit=args.credit,
+                    notes=args.notes,
+                ),
+            ),
+        )
+        validate_edit(updated)
+        out = write_edit_json(updated, _edit_out_path(args.edit, args.out))
+        print(f"done: {out}")
+        return 0
+
+    if args.command == "propose-beat":
+        from .edit import BeatCandidate, load_edit, write_edit_json
+        from .planning import add_beat_candidates
+
+        edit = load_edit(args.edit)
+        updated = add_beat_candidates(
+            edit,
+            BeatCandidate(
+                id=args.id,
+                token_start=args.token_start,
+                token_end=args.token_end,
+                route=args.route,
+                interpretation=args.interpretation,
+                source_plan=args.source_plan,
+                fallback=args.fallback,
+                source_ids=tuple(args.source_id),
+                asset_ids=tuple(args.asset_id),
+            ),
+        )
+        out = write_edit_json(updated, _edit_out_path(args.edit, args.out))
+        print(f"done: {out}")
+        return 0
+
+    if args.command == "approve-beat":
+        from .edit import load_edit, write_edit_json
+        from .planning import approve_beat
+
+        updated = approve_beat(load_edit(args.edit), args.beat_id, args.asset_id)
+        out = write_edit_json(updated, _edit_out_path(args.edit, args.out))
+        print(f"done: {out}")
+        return 0
+
+    if args.command == "reject-beat":
+        from .edit import load_edit, write_edit_json
+        from .planning import reject_beat
+
+        updated = reject_beat(load_edit(args.edit), args.beat_id, args.reason)
+        out = write_edit_json(updated, _edit_out_path(args.edit, args.out))
+        print(f"done: {out}")
+        return 0
+
+    if args.command == "compile-manifest":
+        from .compile import compile_edit_to_manifest, write_manifest_json
+        from .edit import load_edit
+
+        manifest = compile_edit_to_manifest(
+            load_edit(args.edit),
+            args.base,
+            args.output,
+            size=_parse_size(args.size),
+            fps=args.fps,
+        )
+        out = write_manifest_json(manifest, args.manifest)
+        print(f"done: {out}")
         return 0
 
     if args.command == "zoom-still":
@@ -170,6 +359,10 @@ def _parse_size(value: str) -> tuple[int, int]:
     if len(raw) != 2:
         raise argparse.ArgumentTypeError("size must be WIDTHxHEIGHT")
     return int(raw[0]), int(raw[1])
+
+
+def _edit_out_path(edit_path: str, out_path: str | None) -> Path:
+    return Path(out_path) if out_path else Path(edit_path)
 
 
 if __name__ == "__main__":
