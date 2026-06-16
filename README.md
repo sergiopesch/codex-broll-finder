@@ -1,5 +1,7 @@
 # Codex B-Roll Finder
 
+![Codex B-Roll Finder product concept showing an AI-assisted video editing timeline, b-roll cards, validation checks, captions, audio waveform, and social export presets.](docs/assets/codex-broll-finder-hero.png)
+
 A Codex-native version of Louise de Sadeleer's `b-roll-finder`: a skill plus helper tooling for planning, sourcing, formatting, placing, and visually verifying b-roll for talking-head videos.
 
 This repo is intentionally split into:
