@@ -4,6 +4,8 @@ Use `KINO-MANIFEST.json` as the current executable source of truth for Phase 1 c
 
 `KINO-EDIT.json` is the staged project-level format for the broader edit engine. It is not the complete execution format yet; treat it as the contract future graph execution should grow into while the cutaway manifest remains supported.
 
+`KINO-PLAN.json` is the review artifact between transcript understanding and edit-state mutation. It lets Codex propose beat choices for approval before sourcing media, changing `KINO-EDIT.json`, or compiling a renderable manifest.
+
 ## Current Cutaway Manifest
 
 ```json
@@ -92,16 +94,79 @@ Use `KINO-MANIFEST.json` as the current executable source of truth for Phase 1 c
 }
 ```
 
+## KINO-PLAN Shape
+
+`KINO-PLAN.json` is small enough for review and strict enough to validate before it enters project state. It does not expose seconds, durations, start ratios, end ratios, or selected assets:
+
+```json
+{
+  "version": 1,
+  "schema": "kino.plan.v1",
+  "id": "demo:social-short:plan",
+  "edit_id": "demo",
+  "transcript_id": "tx001",
+  "transcript_hash": "sha256:...",
+  "archetype_id": "social-short",
+  "aspect_ratio": "9:16",
+  "summary": {
+    "asset_count": 1,
+    "cue_count": 4,
+    "beat_count": 5,
+    "average_confidence": 0.74,
+    "review_notes": []
+  },
+  "cues": [],
+  "beats": [
+    {
+      "id": "planbeat:01:hook",
+      "role": "hook",
+      "anchor": {
+        "token_start": 0,
+        "token_end": 6,
+        "word_start_id": "w001",
+        "word_end_id": "w006",
+        "quote": "This mistake cost us a week"
+      },
+      "route": "hook",
+      "interpretation": "Show the canonical source while this claim is spoken.",
+      "source_plan": "Capture the source page after approval.",
+      "fallback": "Use a generated explainer card if the page cannot be captured.",
+      "confidence": 0.78,
+      "reasons": ["Uses archetype section 'hook' from template 'hook'."],
+      "cue_ids": ["cue:01:problem"],
+      "asset_fits": [
+        {
+          "asset_id": "asset001",
+          "source_id": "src001",
+          "role": "product-ui",
+          "score": 0.91,
+          "reasons": ["asset role 'product-ui' matches beat role 'hook'"]
+        }
+      ]
+    }
+  ]
+}
+```
+
+The CLI contract is:
+
+1. `plan-edit KINO-EDIT.json KINO-PLAN.json --archetype social-short` creates proposed beats with reasons and confidence from transcript/source/asset state.
+2. `validate-plan KINO-PLAN.json` checks schema, transcript anchors, confidence bounds, asset references, and editorial review metadata.
+3. `apply-plan KINO-PLAN.json KINO-EDIT.json` imports validated proposed beats into `KINO-EDIT.json` without sourcing assets, approving taste decisions, or compiling render output.
+
+Current rendering still starts from `KINO-MANIFEST.json`.
+
 ## Transcript-To-Manifest Planning
 
 The second build planning loop is:
 
 1. `init-edit` creates `KINO-EDIT.json` from project metadata, source media, and transcript tokens.
-2. Codex proposes beat candidates against transcript token ranges. Proposed beats should include the route, interpretation, source plan, candidate sources/assets, and unresolved questions.
-3. Approved beats are marked `approved` with the selected asset and enough timing information to become manifest beats.
-4. Rejected beats stay in `KINO-EDIT.json` as `rejected` with a rationale. Do not silently delete them; they prevent repeated bad suggestions and preserve edit history.
-5. `compile-manifest` writes approved, renderable beats into `KINO-MANIFEST.json`.
-6. Rendering still uses `KINO-MANIFEST.json`: run `validate-manifest`, then `render-cutaways`, then `verify-frames`.
+2. Codex proposes beat candidates against transcript token ranges, ideally as `KINO-PLAN.json` when a review step is needed. Proposed beats should include the route, interpretation, source plan, candidate sources/assets when known, fallback, and unresolved questions.
+3. Validated plan beats are imported into `KINO-EDIT.json` as proposed state.
+4. Approved beats are marked `approved` with the selected asset and enough timing information to become manifest beats.
+5. Rejected beats stay in `KINO-EDIT.json` as `rejected` with a rationale. Do not silently delete them; they prevent repeated bad suggestions and preserve edit history.
+6. `compile-manifest` writes approved, renderable beats into `KINO-MANIFEST.json`.
+7. Rendering still uses `KINO-MANIFEST.json`: run `validate-manifest`, then `render-cutaways`, then `verify-frames`.
 
 `KINO-EDIT.json` is allowed to hold incomplete or rejected planning state. `KINO-MANIFEST.json` should contain only renderable, approved cutaway beats.
 

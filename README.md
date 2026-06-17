@@ -4,7 +4,7 @@
 
 Kino is a Codex-native video edit engine: a manifest-driven core plus helper tooling for planning, assembling, rendering, exporting, and verifying video edits.
 
-The current executable format is `KINO-MANIFEST.json` for cutaway edits. The staged edit-engine foundation is `KINO-EDIT.json`: a project-level planning model for transcript tokens, sources, asset candidates, beat candidates, approvals, and rejections. The package also includes a typed render graph that can represent the existing cutaway manifest, plus render receipts for cutaway renders.
+The current executable format is `KINO-MANIFEST.json` for cutaway edits. The staged edit-engine foundation is `KINO-EDIT.json`: a project-level planning model for transcript tokens, sources, asset candidates, beat candidates, approvals, and rejections. `KINO-PLAN.json` is the reviewable beat-plan contract that Codex can propose before assets are sourced or merged into project state. The package also includes a typed render graph that can represent the existing cutaway manifest, plus render receipts for cutaway renders.
 
 This repo is intentionally split into:
 
@@ -40,6 +40,14 @@ kino plan-replica examples/archetypes/social-short/reference-analysis.json --jso
 ```
 
 The archetype runner generates all media at runtime and writes intent-level `KINO-EDIT.json` plus `KINO-MANIFEST.json` skeletons for `social-short` and `founder-product-explainer`; no downloaded reference video is committed.
+
+Generate proposed beats from an edit state without exposing a manual timeline:
+
+```bash
+kino plan-edit KINO-EDIT.json KINO-PLAN.json --archetype social-short
+kino validate-plan KINO-PLAN.json
+kino apply-plan KINO-PLAN.json KINO-EDIT.json --out KINO-EDIT.json
+```
 
 External tools used by real video workflows:
 
@@ -81,12 +89,23 @@ Kino is moving in stages from a cutaway manifest to a graph-backed edit engine:
 
 - `KINO-MANIFEST.json` remains the supported Phase 1 execution input.
 - `KINO-EDIT.json` is the planning state initialized by `init-edit` for transcript tokens, source receipts, asset candidates, beat candidates, approvals, and rejections.
+- `KINO-PLAN.json` is the human-review artifact between transcript understanding and edit-state mutation. It contains proposed beats, token anchors, quote snippets, route classifications, interpretations, sourcing plans, asset fit scores, reasons, and confidence values without downloading media, approving taste decisions, or exposing a user-facing timeline.
 - The second build target is a transcript-to-manifest planning loop: initialize an edit, propose beats from transcript ranges, approve or reject each candidate, then run `compile-manifest` to write the approved beats into `KINO-MANIFEST.json`.
 - Rendering still goes through `KINO-MANIFEST.json`: validate with `validate-manifest`, render with `render-cutaways`, inspect with `verify-frames`, and write QC artifacts with `make-contact-sheet`, `check-frames`, and `analyze-audio`.
 - The render graph is a typed intermediate representation for sources, tracks, clips, outputs, validation expectations, canonical JSON, and stable hashes.
 - Cutaway renders now write `KINO-RENDER.json` with manifest hash, render graph hash, ffmpeg command hash, tool versions, paths, and formatted-asset commands.
 - Source receipts are represented in `KINO-EDIT.json`; automated source-receipt writing and graph execution are still future work.
 - Archetype replication is represented as intent-level plans: `list-archetypes`, `plan-replica`, and `examples/archetypes/` describe social-short and founder-product-explainer structures without exposing timeline editing to the user.
+
+### KINO-PLAN CLI
+
+```bash
+kino plan-edit KINO-EDIT.json KINO-PLAN.json --archetype social-short
+kino validate-plan KINO-PLAN.json
+kino apply-plan KINO-PLAN.json KINO-EDIT.json --out KINO-EDIT.json
+```
+
+`plan-edit` reads transcript, source, and asset state from `KINO-EDIT.json`, chooses archetype sections, scores matching assets, and writes proposed beats with reasons and confidence. `validate-plan` is the schema/editorial gate. `apply-plan` imports validated beats into `KINO-EDIT.json` as `proposed` while preserving plan rationale metadata; rendering still requires explicit approval and `compile-manifest`.
 
 ## Product Direction
 

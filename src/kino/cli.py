@@ -137,6 +137,20 @@ def main(argv: list[str] | None = None) -> int:
     replica.add_argument("--target-duration", type=float)
     replica.add_argument("--json-out")
 
+    plan_edit = sub.add_parser("plan-edit", help="Create KINO-PLAN.json proposed beats from KINO-EDIT state")
+    plan_edit.add_argument("edit")
+    plan_edit.add_argument("plan")
+    plan_edit.add_argument("--archetype", required=True, choices=["social-short", "founder-product-explainer"])
+    plan_edit.add_argument("--edit-out", help="Also import planned beats into this KINO-EDIT.json path")
+
+    validate_plan = sub.add_parser("validate-plan", help="Parse and validate KINO-PLAN.json")
+    validate_plan.add_argument("plan")
+
+    apply_plan = sub.add_parser("apply-plan", help="Import KINO-PLAN.json beats into KINO-EDIT.json as proposed")
+    apply_plan.add_argument("plan")
+    apply_plan.add_argument("edit")
+    apply_plan.add_argument("--out")
+
     probe = sub.add_parser("probe-media", help="Probe media streams with ffprobe and print JSON")
     probe.add_argument("input")
 
@@ -423,6 +437,34 @@ def main(argv: list[str] | None = None) -> int:
         if args.json_out:
             Path(args.json_out).write_text(json.dumps(data, indent=2) + "\n")
         print(json.dumps(data, indent=2))
+        return 0
+
+    if args.command == "plan-edit":
+        from .edit import load_edit, write_edit_json
+        from .plan import apply_plan_to_edit, plan_edit, write_plan_json
+
+        edit = load_edit(args.edit)
+        plan = plan_edit(edit, archetype_id=args.archetype)
+        write_plan_json(plan, args.plan)
+        if args.edit_out:
+            write_edit_json(apply_plan_to_edit(edit, plan), args.edit_out)
+        print(json.dumps(plan.to_dict(), indent=2))
+        return 0
+
+    if args.command == "validate-plan":
+        from .plan import load_plan
+
+        plan = load_plan(args.plan)
+        print(f"ok: {len(plan.beats)} beats")
+        return 0
+
+    if args.command == "apply-plan":
+        from .edit import load_edit, write_edit_json
+        from .plan import apply_plan_to_edit, load_plan
+
+        updated = apply_plan_to_edit(load_edit(args.edit), load_plan(args.plan))
+        out = write_edit_json(updated, _edit_out_path(args.edit, args.out))
+        print(f"done: {out}")
         return 0
 
     if args.command == "probe-media":

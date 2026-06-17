@@ -25,15 +25,19 @@ The agent narrows the funnel; the user makes taste calls. For objective routes, 
 
 ## Planning Contract
 
+When a workflow needs an explicit review artifact, write `KINO-PLAN.json` before sourcing media or mutating `KINO-EDIT.json`. Treat it as the proposed plan for human or agent approval, not as executable render state or a user-facing timeline.
+
 Each proposed beat must include:
 
 - `id`: stable short id, such as `b001`
-- `time`: transcript or word-timestamp anchor
-- `line`: the narration being illustrated
+- `anchor`: transcript token range, word ids, and quote being illustrated
 - `interpretation`: what the line is actually about
 - `route`: `receipt`, `entity`, `product-ui`, `concept`, `evocative`, or `taste`
 - `source_plan`: where the correct asset should come from
 - `fallback`: what to try if the preferred source fails
+- `reasons` and `confidence`: why Kino proposed the beat and how strong the match is
+
+Use `plan-edit` to generate `KINO-PLAN.json`, `validate-plan` to gate it, and `apply-plan` to import it into `KINO-EDIT.json` as proposed beats. Once the plan is approved, renderable output still compiles through `KINO-MANIFEST.json`.
 
 Before sourcing, check the palette. If more than 60% of planned beats are website screenshots, revise the plan unless the script is explicitly receipt-heavy.
 
@@ -57,6 +61,9 @@ python3 kino/scripts/kino_tool.py --help
 
 Primary commands:
 
+- `plan-edit`, `validate-plan`, and `apply-plan`: create, validate, and import `KINO-PLAN.json` proposed beats.
+- `init-edit`: create `KINO-EDIT.json` from transcript JSON.
+- `propose-beat`, `approve-beat`, `reject-beat`, and `compile-manifest`: maintain planning state and compile approved beats to `KINO-MANIFEST.json`.
 - `validate-manifest`: parse and check `KINO-MANIFEST.json`.
 - `zoom-still`: render a smooth sub-pixel still zoom without ffmpeg `zoompan`.
 - `capture-page`: capture a public page or tweet embed with headless Chrome/Chromium.

@@ -117,6 +117,8 @@ The agent should produce a coherent launch/demo edit from raw founder footage, s
 
 ## Build Implications
 
+These two archetypes now feed `KINO-PLAN.json`: `kino plan-edit KINO-EDIT.json KINO-PLAN.json --archetype social-short` or `--archetype founder-product-explainer` turns transcript, source, and asset state into proposed beats with token anchors, reasons, asset-fit scores, and confidence. The user reviews intent; Kino owns the internal timing and render compilation.
+
 These two archetypes point to the next foundation:
 
 1. Transcription and word alignment as the timing spine.

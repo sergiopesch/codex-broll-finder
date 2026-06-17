@@ -57,12 +57,126 @@ def test_help_exposes_phase_1_commands(capsys):
         "list-presets",
         "list-archetypes",
         "plan-replica",
+        "plan-edit",
+        "validate-plan",
+        "apply-plan",
         "probe-media",
         "analyze-audio",
         "validate-export",
         "export-variant",
     ):
         assert command in out
+
+
+def test_help_exposes_kino_plan_contract(capsys):
+    with pytest.raises(SystemExit) as exc:
+        cli.main(["--help"])
+
+    assert exc.value.code == 0
+    out = capsys.readouterr().out
+    assert "validate-plan" in out
+    assert "apply-plan" in out
+
+
+def test_plan_edit_writes_reviewable_plan_and_validates_it(tmp_path, capsys):
+    transcript = tmp_path / "transcript.json"
+    edit = tmp_path / "KINO-EDIT.json"
+    plan = tmp_path / "KINO-PLAN.json"
+    transcript.write_text(
+        json.dumps(
+            {
+                "id": "tx001",
+                "language": "en",
+                "source": "input.mp4",
+                "words": [
+                    {"id": "w001", "text": "This", "start": 0.0, "end": 0.2},
+                    {"id": "w002", "text": "mistake", "start": 0.2, "end": 0.5},
+                    {"id": "w003", "text": "cost", "start": 0.5, "end": 0.8},
+                    {"id": "w004", "text": "a", "start": 0.8, "end": 0.9},
+                    {"id": "w005", "text": "week", "start": 0.9, "end": 1.2},
+                    {"id": "w006", "text": "watch", "start": 1.2, "end": 1.5},
+                    {"id": "w007", "text": "the", "start": 1.5, "end": 1.6},
+                    {"id": "w008", "text": "demo", "start": 1.6, "end": 2.0},
+                    {"id": "w009", "text": "and", "start": 2.0, "end": 2.1},
+                    {"id": "w010", "text": "try", "start": 2.1, "end": 2.3},
+                    {"id": "w011", "text": "Kino", "start": 2.3, "end": 2.6},
+                ],
+            }
+        )
+    )
+
+    assert cli.main(["init-edit", str(transcript), str(edit), "--id", "edit001"]) == 0
+    assert cli.main(["add-source", str(edit), "src001", "generated", "fixture://ui-proof", "--title", "UI proof"]) == 0
+    assert (
+        cli.main(
+            [
+                "add-asset",
+                str(edit),
+                "asset001",
+                "src001",
+                "image",
+                "assets/ui-proof.png",
+                "--score",
+                "0.9",
+                "--notes",
+                "product UI demo proof",
+            ]
+        )
+        == 0
+    )
+    capsys.readouterr()
+    assert cli.main(["plan-edit", str(edit), str(plan), "--archetype", "social-short"]) == 0
+    data = json.loads(capsys.readouterr().out)
+
+    assert data["schema"] == "kino.plan.v1"
+    assert data["version"] == 1
+    assert data["edit_id"] == "edit001"
+    assert data["archetype_id"] == "social-short"
+    assert data["transcript_hash"].startswith("sha256:")
+    assert data["summary"]["beat_count"] == len(data["beats"])
+    assert "duration" not in json.dumps(data)
+    assert data["beats"][0]["anchor"]["quote"]
+    assert data["beats"][0]["confidence"] > 0
+    assert data["beats"][0]["reasons"]
+    assert data["beats"][0]["asset_fits"]
+    assert json.loads(plan.read_text()) == data
+
+    assert cli.main(["validate-plan", str(plan)]) == 0
+    assert "ok:" in capsys.readouterr().out
+
+
+def test_apply_plan_imports_proposed_beats_into_edit(tmp_path):
+    transcript = tmp_path / "transcript.json"
+    edit = tmp_path / "KINO-EDIT.json"
+    plan = tmp_path / "KINO-PLAN.json"
+    transcript.write_text(
+        json.dumps(
+            {
+                "id": "tx001",
+                "language": "en",
+                "source": "input.mp4",
+                "words": [
+                    {"id": "w001", "text": "Kino", "start": 0.0, "end": 0.25},
+                    {"id": "w002", "text": "plans", "start": 0.25, "end": 0.6},
+                    {"id": "w003", "text": "better", "start": 0.6, "end": 0.9},
+                    {"id": "w004", "text": "proof", "start": 0.9, "end": 1.2},
+                    {"id": "w005", "text": "beats", "start": 1.2, "end": 1.5},
+                ],
+            }
+        )
+    )
+
+    assert cli.main(["init-edit", str(transcript), str(edit), "--id", "edit001"]) == 0
+    assert cli.main(["plan-edit", str(edit), str(plan), "--archetype", "founder-product-explainer"]) == 0
+    assert cli.main(["apply-plan", str(plan), str(edit)]) == 0
+
+    data = json.loads(edit.read_text())
+    assert data["beats"]
+    assert all(beat["status"] == "proposed" for beat in data["beats"])
+    assert all(beat["selected_asset_id"] is None for beat in data["beats"])
+    assert all(beat["plan_id"] == "edit001:founder-product-explainer:plan" for beat in data["beats"])
+    assert all(beat["confidence"] > 0 for beat in data["beats"])
+    assert all(beat["reasons"] for beat in data["beats"])
 
 
 def test_edit_planning_cli_flow_compiles_manifest(tmp_path):

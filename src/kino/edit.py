@@ -179,10 +179,15 @@ class BeatCandidate:
     selected_asset_id: str | None = None
     status: ApprovalState = "proposed"
     rejection_reason: str | None = None
+    plan_id: str | None = None
+    role: str | None = None
+    confidence: float | None = None
+    reasons: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "source_ids", tuple(self.source_ids))
         object.__setattr__(self, "asset_ids", tuple(self.asset_ids))
+        object.__setattr__(self, "reasons", tuple(self.reasons))
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> BeatCandidate:
@@ -199,6 +204,10 @@ class BeatCandidate:
             selected_asset_id=_optional_str(data, "selected_asset_id"),
             status=_required_str(data, "status") if "status" in data else "proposed",  # type: ignore[arg-type]
             rejection_reason=_optional_str(data, "rejection_reason"),
+            plan_id=_optional_str(data, "plan_id"),
+            role=_optional_str(data, "role"),
+            confidence=_optional_float(data, "confidence"),
+            reasons=_str_tuple(data.get("reasons", ()), "reasons"),
         )
 
     def to_dict(self) -> dict[str, object]:
@@ -215,6 +224,10 @@ class BeatCandidate:
             "selected_asset_id": self.selected_asset_id,
             "status": self.status,
             "rejection_reason": self.rejection_reason,
+            "plan_id": self.plan_id,
+            "role": self.role,
+            "confidence": self.confidence,
+            "reasons": list(self.reasons),
         }
 
 
@@ -387,6 +400,13 @@ def _validate_beat(
         raise EditError(f"{beat.id}: source_plan must not be empty")
     if beat.status not in ("proposed", "approved", "rejected"):
         raise EditError(f"{beat.id}: unsupported approval status: {beat.status}")
+    if beat.plan_id is not None:
+        _validate_id(beat.plan_id, f"{beat.id} plan id")
+    if beat.confidence is not None and not 0 <= beat.confidence <= 1:
+        raise EditError(f"{beat.id}: confidence must be between 0 and 1")
+    for reason in beat.reasons:
+        if reason == "":
+            raise EditError(f"{beat.id}: reasons must not contain empty values")
 
     beat_source_ids = _validate_unique_ids(beat.source_ids, f"{beat.id} source reference")
     beat_asset_ids = _validate_unique_ids(beat.asset_ids, f"{beat.id} asset reference")
