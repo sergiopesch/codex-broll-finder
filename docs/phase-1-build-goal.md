@@ -27,6 +27,7 @@ Phase 1 includes:
 - the documented `init-edit` -> propose beat -> approve/reject beat -> `compile-manifest` planning flow
 - typed render graph data structures and conversion from the current cutaway manifest
 - render receipts for successful cutaway renders
+- a reproducible `examples/quickstart/` sample that generates tiny media at runtime and exercises the full current loop
 - repo-local plugin scaffold validation, including bundled skill and helper source
 
 Phase 1 does not yet include:
@@ -84,6 +85,7 @@ The Phase 1 build is acceptable when:
 - Validation reports include concrete checks for container, dimensions, codec, pixel format, scan type, square pixels, frame rate, audio codec/sample rate, and fast-start atom order when the file is available.
 - Docs identify the future `KINO-EDIT` model without claiming the graph executor is complete.
 - Docs make clear that transcript planning compiles to `KINO-MANIFEST.json` and rendering still uses the manifest path.
+- `python3 examples/quickstart/run.py --workdir /tmp/kino-quickstart` generates media at runtime and writes `KINO-EDIT.json`, `KINO-MANIFEST.json`, `KINO-RENDER.json`, render output, verification frames, export variant, and validation reports.
 
 ## Verification Commands
 

@@ -663,7 +663,8 @@ Current implementation status:
 - `KINO-EDIT` planning-state data structures are implemented
 - typed render graph data structures and cutaway manifest conversion are implemented
 - cutaway renders write `KINO-RENDER.json`
-- transcript-to-manifest planning commands such as `init-edit`, beat proposal approval/rejection, and `compile-manifest` are the next documented build target
+- transcript-to-manifest planning commands such as `init-edit`, beat proposal approval/rejection, and `compile-manifest` are implemented
+- `examples/quickstart/` generates tiny media at runtime and runs the current end-to-end planning/render/export/validation loop
 - graph execution beyond the current cutaway renderer and automated source-receipt writing are not implemented yet
 
 ### Phase 2: Social Editing Core

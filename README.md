@@ -24,6 +24,14 @@ python kino/scripts/kino_tool.py --help
 pytest
 ```
 
+Run the reproducible sample edit:
+
+```bash
+python3 examples/quickstart/run.py
+```
+
+The quickstart generates tiny media with `ffmpeg`, writes all artifacts under `examples/quickstart/out/`, and exercises the current loop: `init-edit` -> `add-source`/`add-asset` -> `propose-beat` -> `approve-beat` -> `compile-manifest` -> `render-cutaways` -> `verify-frames` -> `export-variant` -> `validate-export`.
+
 External tools used by real video workflows:
 
 - `ffmpeg` and `ffprobe`
