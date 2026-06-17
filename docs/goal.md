@@ -4,6 +4,8 @@ Build `kino` into an open-source Codex-native video editing system: first as a h
 
 The controlling specification is [product-spec.md](./product-spec.md).
 
+The target editing formats are captured in [video-archetypes.md](./video-archetypes.md).
+
 The active implementation target is [phase-1-build-goal.md](./phase-1-build-goal.md).
 
 ## Product Thesis
@@ -25,7 +27,7 @@ Why:
 ## Milestones
 
 1. **Skill MVP**: source and place b-roll from a transcript or base video using a manifest-driven render loop.
-2. **Editing Core**: expand from b-roll to timeline operations, captions, titles, audio normalization, transitions, effects, and export presets.
+2. **Editing Core**: expand from b-roll to intent-level edit compilation: captions, titles, audio normalization, transitions, effects, internal render graphs, and export presets.
 3. **Quality Harness**: add automated and visual tests for frame accuracy, audio loudness, captions, safe zones, and export compliance.
 4. **Plugin Package**: add `.codex-plugin/plugin.json`, marketplace metadata, install tests, and optional MCP/app integrations.
 5. **Public Release**: publish docs, examples, demo assets, contribution guide, and a reproducible evaluation suite.

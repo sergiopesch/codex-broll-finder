@@ -1,12 +1,14 @@
 # Kino Product Specification
 
-Last updated: 2026-06-16
+Last updated: 2026-06-17
 
 ## 1. Executive Summary
 
 Kino should become an open-source Codex-native video editing system. The initial product is a cutaway specialist for talking-head edits. The expanded product is a reproducible editing layer where Codex can plan, source, assemble, validate, and export professional video edits without relying on a GUI timeline.
 
 The system should learn from the quality bar of Final Cut Pro, DaVinci Resolve, Premiere Pro, After Effects, CapCut, Descript, and Runway, but it should not clone their interfaces. The differentiator is agentic editing: structured intent, source-aware assets, manifests, deterministic render graphs, receipts, and verifiable outputs.
+
+The first target formats are defined in [video-archetypes.md](./video-archetypes.md). Kino should learn concrete editing grammars such as social shorts and founder product explainers, then compile user intent into an internal edit graph.
 
 ## 2. Codex Surface Decision
 
@@ -83,7 +85,7 @@ Flow:
 
 1. inspect media
 2. create edit plan with story beats
-3. propose timeline operations
+3. propose intent-level edit operations
 4. normalize audio and assemble picture
 5. add b-roll, captions, titles, motion graphics, effects, transitions
 6. export platform variants
@@ -155,7 +157,7 @@ The second build should implement transcript-to-manifest planning v1. `init-edit
 
 `compile-manifest` should be the bridge from planning to execution: it reads `KINO-EDIT.json`, selects approved renderable beats, resolves their formatted assets, and writes `KINO-MANIFEST.json`. Rendering still goes through `validate-manifest`, `render-cutaways`, and `verify-frames` until graph execution has parity.
 
-The render graph should be deterministic. The initial implementation models sources, tracks, clips, outputs, validation expectations, canonical JSON, and stable hashes for current cutaway manifests. Later graph execution can expand this into explicit operation nodes such as ingest, trim, still-motion, cover-crop, overlay, audio-preserve, audio-duck, concat, export, probe, validate, and contact-sheet generation. Re-running an unchanged node should either reuse its artifact or produce the same command and output characteristics.
+The render graph should be deterministic. The initial implementation models sources, tracks, clips, outputs, validation expectations, canonical JSON, and stable hashes for current cutaway manifests. Later graph execution can expand this into explicit operation nodes such as ingest, trim, still-motion, cover-crop, overlay, caption render, audio-preserve, audio-duck, concat, export, probe, validate, and contact-sheet generation. Re-running an unchanged node should either reuse its artifact or produce the same command and output characteristics.
 
 Source receipts should be recorded before assets enter the formatted cache. Each receipt should include the source URL or local path, retrieval method, captured timestamp, credit string, rights/license notes, selected time range or viewport, checksum when available, and the formatted asset path derived from it.
 
