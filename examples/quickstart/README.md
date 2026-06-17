@@ -21,6 +21,14 @@ The run writes all generated files to `examples/quickstart/out` by default:
 - `export.landscape-web.mp4`
 - `KINO-VALIDATION.json`
 - `KINO-VALIDATION.md`
+- `KINO-EVAL.json`
+- `KINO-EVAL.md`
+
+The final runner step aggregates generated QC artifacts with:
+
+```bash
+kino eval --frame-qc KINO-FRAME-QC.json --audio-qc KINO-AUDIO-QC.json --validation KINO-VALIDATION.json --out KINO-EVAL.json --md-out KINO-EVAL.md
+```
 
 Use a temporary output directory when you want a clean run:
 
@@ -30,6 +38,27 @@ python3 examples/quickstart/run.py --workdir /tmp/kino-quickstart
 
 The runner requires `ffmpeg`, `ffprobe`, and the Python package dependencies from the repo setup step, including Pillow for contact-sheet generation. It sets `PYTHONPATH` for child CLI calls so it can run directly from an installed source checkout.
 
-The sample keeps one approved beat and one rejected beat in `KINO-EDIT.json`. Only the approved beat is compiled into `KINO-MANIFEST.json`, which is still the render input for this milestone.
+The sample keeps one approved beat and one rejected beat in `KINO-EDIT.json`. Only the approved beat is compiled into `KINO-MANIFEST.json`, which is still the render input for this milestone. The complete command loop is:
 
-After rendering, the runner extracts verification frames, generates a labeled contact sheet, writes frame QC reports, analyzes audio on the rendered master, exports a platform variant, and validates that export against the selected preset.
+```text
+init-edit
+add-source
+add-asset
+propose-beat
+approve-beat
+propose-beat
+reject-beat
+compile-manifest
+render-cutaways
+verify-frames
+make-contact-sheet
+check-frames
+analyze-audio
+export-variant
+validate-export
+eval
+```
+
+After rendering, the runner extracts verification frames, generates a labeled contact sheet, writes frame QC reports, analyzes audio on the rendered master, exports a platform variant, validates that export against the selected preset, and writes a final `KINO-EVAL` scorecard.
+
+This example does not test live sourcing, transcription, `KINO-PLAN.json`, caption rendering, or graph execution. Those are separate contracts: archetype planning lives under `examples/archetypes/`, KINO-EVAL aggregation runs over generated QC artifacts, and rendering still starts from `KINO-MANIFEST.json`.

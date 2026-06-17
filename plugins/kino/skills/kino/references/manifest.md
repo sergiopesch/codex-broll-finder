@@ -8,6 +8,8 @@ Use `KINO-MANIFEST.json` as the current executable source of truth for Phase 1 c
 
 `KINO-CAPTIONS.json` is the transcript-derived caption artifact. It stores word-aligned caption segments, style presets, emphasized words, reasons, and confidence before ffmpeg burns captions into a rendered video.
 
+`KINO-EVAL.json` is the build/test/refine scorecard. It aggregates specialized reports into a normalized status, score, decision, and next-action list.
+
 ## Current Cutaway Manifest
 
 ```json
@@ -206,6 +208,48 @@ The CLI contract is:
 1. `plan-captions KINO-EDIT.json KINO-CAPTIONS.json --archetype social-short` creates readable word-aligned caption segments.
 2. `validate-captions KINO-CAPTIONS.json --edit KINO-EDIT.json` checks readability, token anchors, transcript hash parity, and confidence bounds.
 3. `render-captions input.mp4 KINO-CAPTIONS.json output.captioned.mp4` writes an ASS sidecar and burns captions into the video.
+
+## KINO-EVAL Shape
+
+`KINO-EVAL.json` should be generated after the available planning, caption, frame, audio, and export checks:
+
+```json
+{
+  "version": 1,
+  "schema": "kino.eval.v1",
+  "id": "kino-eval",
+  "overall": "warning",
+  "score": 0.842,
+  "decision": "revise-before-handoff",
+  "recommendations": ["Review 1 audio-qc warning/manual-review item(s)."],
+  "artifacts": [
+    {
+      "kind": "audio-qc",
+      "path": "KINO-AUDIO-QC.json",
+      "status": "warning",
+      "score": 0.65,
+      "summary": "audio-qc overall warning with 1 check(s)"
+    }
+  ],
+  "checks": [
+    {
+      "name": "audio-qc_issue_count",
+      "category": "audio-qc",
+      "status": "warning",
+      "score": 0.5,
+      "message": "audio-qc report has 0 fail(s) and 1 warning/manual-review item(s).",
+      "recommendation": "Review 1 audio-qc warning/manual-review item(s).",
+      "artifact": "KINO-AUDIO-QC.json"
+    }
+  ]
+}
+```
+
+The CLI contract is:
+
+1. `eval --plan KINO-PLAN.json --captions KINO-CAPTIONS.json --frame-qc KINO-FRAME-QC.json --audio-qc KINO-AUDIO-QC.json --validation KINO-VALIDATION.json --out KINO-EVAL.json --md-out KINO-EVAL.md`
+2. Default exit behavior matches other Kino QC commands: nonzero only on `fail`.
+3. `--strict` exits nonzero unless the evaluation passes cleanly.
 
 ## Transcript-To-Manifest Planning
 

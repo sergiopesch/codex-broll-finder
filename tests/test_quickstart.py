@@ -59,9 +59,10 @@ def test_quickstart_runner_invokes_cli_loop_after_generating_media(tmp_path, mon
         "analyze-audio",
         "export-variant",
         "validate-export",
+        "eval",
     ]
-    assert cli_calls[-5][3:] == ["make-contact-sheet", "verify_frames", "KINO-CONTACT-SHEET.jpg"]
-    assert cli_calls[-4][3:] == [
+    assert cli_calls[-6][3:] == ["make-contact-sheet", "verify_frames", "KINO-CONTACT-SHEET.jpg"]
+    assert cli_calls[-5][3:] == [
         "check-frames",
         "verify_frames",
         "--manifest",
@@ -73,7 +74,7 @@ def test_quickstart_runner_invokes_cli_loop_after_generating_media(tmp_path, mon
         "--contact-sheet",
         "KINO-CONTACT-SHEET.jpg",
     ]
-    assert cli_calls[-3][3:] == [
+    assert cli_calls[-4][3:] == [
         "analyze-audio",
         "rendered.mp4",
         "--json-out",
@@ -82,13 +83,28 @@ def test_quickstart_runner_invokes_cli_loop_after_generating_media(tmp_path, mon
         "KINO-AUDIO-QC.md",
         "--strict",
     ]
-    assert cli_calls[-2][-4:] == ["--preset", "landscape-web", "--crf", "28"]
-    assert cli_calls[-1][-5:] == [
+    assert cli_calls[-3][-4:] == ["--preset", "landscape-web", "--crf", "28"]
+    assert cli_calls[-2][-5:] == [
         "--json-out",
         "KINO-VALIDATION.json",
         "--md-out",
         "KINO-VALIDATION.md",
         "--strict",
+    ]
+    assert cli_calls[-1][3:] == [
+        "eval",
+        "--id",
+        "quickstart-eval",
+        "--frame-qc",
+        "KINO-FRAME-QC.json",
+        "--audio-qc",
+        "KINO-AUDIO-QC.json",
+        "--validation",
+        "KINO-VALIDATION.json",
+        "--out",
+        "KINO-EVAL.json",
+        "--md-out",
+        "KINO-EVAL.md",
     ]
 
 
@@ -137,4 +153,6 @@ def test_quickstart_runner_real_tiny_media_smoke(tmp_path):
     assert outputs["audio_qc_md"].exists()
     assert outputs["export"].exists()
     assert outputs["validation_json"].exists()
+    assert outputs["eval_json"].exists()
+    assert outputs["eval_md"].exists()
     assert any(outputs["verify_frames"].glob("*.jpg"))

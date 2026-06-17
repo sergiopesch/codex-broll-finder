@@ -117,7 +117,7 @@ The agent should produce a coherent launch/demo edit from raw founder footage, s
 
 ## Build Implications
 
-These two archetypes now feed `KINO-PLAN.json`: `kino plan-edit KINO-EDIT.json KINO-PLAN.json --archetype social-short` or `--archetype founder-product-explainer` turns transcript, source, and asset state into proposed beats with token anchors, reasons, asset-fit scores, and confidence. They also feed `KINO-CAPTIONS.json`: `kino plan-captions KINO-EDIT.json KINO-CAPTIONS.json --archetype social-short` creates word-aligned caption segments and archetype-specific styles. The user reviews intent; Kino owns the internal timing and render compilation.
+These two archetypes now feed `KINO-PLAN.json`: `kino plan-edit KINO-EDIT.json KINO-PLAN.json --archetype social-short` or `--archetype founder-product-explainer` turns transcript, source, and asset state into proposed beats with token anchors, reasons, asset-fit scores, and confidence. They also feed `KINO-CAPTIONS.json`: `kino plan-captions KINO-EDIT.json KINO-CAPTIONS.json --archetype social-short` creates word-aligned caption segments and archetype-specific styles. `kino eval --plan KINO-PLAN.json --captions KINO-CAPTIONS.json --out KINO-EVAL.json` aggregates review readiness before sourcing or handoff. The user reviews intent; Kino owns the internal timing and render compilation.
 
 These two archetypes point to the next foundation:
 

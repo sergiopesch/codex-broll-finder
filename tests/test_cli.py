@@ -63,6 +63,7 @@ def test_help_exposes_phase_1_commands(capsys):
         "plan-captions",
         "validate-captions",
         "render-captions",
+        "eval",
         "probe-media",
         "analyze-audio",
         "validate-export",
@@ -232,6 +233,96 @@ def test_caption_cli_flow_plans_validates_and_renders(tmp_path, monkeypatch, cap
     assert output.exists()
     assert (tmp_path / "captioned.ass").exists()
     assert commands
+
+
+def test_eval_cli_aggregates_artifacts_and_strict_mode(tmp_path, capsys):
+    transcript = tmp_path / "transcript.json"
+    edit = tmp_path / "KINO-EDIT.json"
+    plan = tmp_path / "KINO-PLAN.json"
+    captions = tmp_path / "KINO-CAPTIONS.json"
+    frame_qc = tmp_path / "KINO-FRAME-QC.json"
+    audio_qc = tmp_path / "KINO-AUDIO-QC.json"
+    validation = tmp_path / "KINO-VALIDATION.json"
+    eval_json = tmp_path / "KINO-EVAL.json"
+    eval_md = tmp_path / "KINO-EVAL.md"
+    transcript.write_text(
+        json.dumps(
+            {
+                "id": "tx001",
+                "words": [
+                    {"id": "w001", "text": "This", "start": 0.0, "end": 0.25, "confidence": 0.9},
+                    {"id": "w002", "text": "mistake", "start": 0.25, "end": 0.6, "confidence": 0.9},
+                    {"id": "w003", "text": "cost", "start": 0.6, "end": 0.9, "confidence": 0.9},
+                    {"id": "w004", "text": "a", "start": 0.9, "end": 1.0, "confidence": 0.9},
+                    {"id": "w005", "text": "week", "start": 1.0, "end": 1.25, "confidence": 0.9},
+                    {"id": "w006", "text": "watch", "start": 1.25, "end": 1.5, "confidence": 0.9},
+                    {"id": "w007", "text": "the", "start": 1.5, "end": 1.6, "confidence": 0.9},
+                    {"id": "w008", "text": "demo", "start": 1.6, "end": 2.0, "confidence": 0.9},
+                ],
+            }
+        )
+    )
+    frame_qc.write_text(
+        json.dumps(
+            {
+                "overall": "pass",
+                "checks": [{"name": "frames", "status": "pass", "expected": "frames", "observed": "frames", "message": "ok"}],
+            }
+        )
+    )
+    audio_qc.write_text(
+        json.dumps(
+            {
+                "overall": "warning",
+                "checks": [
+                    {"name": "silence", "status": "warning", "expected": "none", "observed": "gap", "message": "review"}
+                ],
+            }
+        )
+    )
+    validation.write_text(
+        json.dumps(
+            {
+                "overall": "pass",
+                "checks": [{"name": "export", "status": "pass", "expected": "preset", "observed": "preset", "message": "ok"}],
+            }
+        )
+    )
+
+    assert cli.main(["init-edit", str(transcript), str(edit), "--id", "edit001"]) == 0
+    assert cli.main(["plan-edit", str(edit), str(plan), "--archetype", "social-short"]) == 0
+    assert cli.main(["plan-captions", str(edit), str(captions), "--archetype", "social-short"]) == 0
+    capsys.readouterr()
+
+    args = [
+        "eval",
+        "--id",
+        "eval001",
+        "--plan",
+        str(plan),
+        "--captions",
+        str(captions),
+        "--frame-qc",
+        str(frame_qc),
+        "--audio-qc",
+        str(audio_qc),
+        "--validation",
+        str(validation),
+        "--out",
+        str(eval_json),
+        "--md-out",
+        str(eval_md),
+    ]
+    assert cli.main(args) == 0
+    data = json.loads(capsys.readouterr().out)
+
+    assert data["schema"] == "kino.eval.v1"
+    assert data["overall"] == "warning"
+    assert data["decision"] == "revise-before-handoff"
+    assert data["recommendations"]
+    assert json.loads(eval_json.read_text()) == data
+    assert eval_md.read_text().startswith("# Kino Evaluation Report")
+    assert cli.main([*args, "--strict"]) == 1
 
 
 def test_edit_planning_cli_flow_compiles_manifest(tmp_path):

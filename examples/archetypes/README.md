@@ -24,6 +24,8 @@ kino plan-replica examples/archetypes/social-short/reference-analysis.json \
   --json-out /tmp/kino-social-replica-plan.json
 ```
 
+`plan-replica` writes an intent-level replica plan, not `KINO-PLAN.json`. Use `kino eval --plan ...` only with review plans produced by `kino plan-edit`; use these fixtures and the runner to validate the doc-to-edit-to-manifest bridge.
+
 ## Recipe Contract
 
 `recipe.json` uses `recipe_schema_version: 1` with this shape:
@@ -50,4 +52,8 @@ The current stable machine-consumable fixture is `KINO-EDIT.json`. It contains:
 
 The higher-level `recipe.json` contract is plain JSON until dedicated recipe APIs exist.
 
-The generated runner uses separate tiny built-in recipes and optional runner-specific JSON overrides. The checked-in `recipe.json` files are richer planner contracts for the real video archetypes, not binary media inputs.
+## Runner Integration
+
+The runner starts with built-in tiny recipes, then loads JSON recipes from `--recipe-dir` and `--recipe` paths. With the default `--recipe-dir`, it adapts the checked-in `*/recipe.json` reference contracts into tiny runtime recipes by turning cue snippets into synthetic transcript words, still assets, approved beats, `KINO-EDIT.json`, and `KINO-MANIFEST.json`. Custom JSON recipes override built-ins by archetype id.
+
+The runner validates the current bridge from repo-safe archetype docs to executable cutaway manifests. It does not download reference videos, does not source real user footage, and does not promise full-fidelity replication. The optional `--render` flag only runs the existing `kino render-cutaways` command against the generated manifest, and KINO-EVAL remains a separate aggregation step over `KINO-PLAN.json`, caption, or QC artifacts produced elsewhere.

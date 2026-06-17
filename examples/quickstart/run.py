@@ -79,6 +79,8 @@ def run_quickstart(
         "export": workdir / f"export.{preset}.mp4",
         "validation_json": workdir / "KINO-VALIDATION.json",
         "validation_md": workdir / "KINO-VALIDATION.md",
+        "eval_json": workdir / "KINO-EVAL.json",
+        "eval_md": workdir / "KINO-EVAL.md",
         "verify_frames": frames_dir,
     }
 
@@ -248,6 +250,26 @@ def run_quickstart(
             "--md-out",
             "KINO-VALIDATION.md",
             "--strict",
+        ],
+        workdir,
+        env,
+    )
+    _run_cli(
+        python,
+        [
+            "eval",
+            "--id",
+            "quickstart-eval",
+            "--frame-qc",
+            "KINO-FRAME-QC.json",
+            "--audio-qc",
+            "KINO-AUDIO-QC.json",
+            "--validation",
+            "KINO-VALIDATION.json",
+            "--out",
+            "KINO-EVAL.json",
+            "--md-out",
+            "KINO-EVAL.md",
         ],
         workdir,
         env,

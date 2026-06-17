@@ -167,6 +167,21 @@ def main(argv: list[str] | None = None) -> int:
     render_captions.add_argument("--ass-out", help="Write/use this ASS subtitle sidecar path")
     render_captions.add_argument("--size", default="1080x1920")
 
+    evaluate = sub.add_parser(
+        "eval",
+        aliases=["evaluate"],
+        help="Aggregate Kino artifact checks into KINO-EVAL.json",
+    )
+    evaluate.add_argument("--id", default="kino-eval", dest="eval_id")
+    evaluate.add_argument("--plan")
+    evaluate.add_argument("--captions")
+    evaluate.add_argument("--frame-qc")
+    evaluate.add_argument("--audio-qc")
+    evaluate.add_argument("--export-validation", "--validation", dest="export_validation")
+    evaluate.add_argument("--json-out", "--out", dest="json_out")
+    evaluate.add_argument("--md-out")
+    evaluate.add_argument("--strict", action="store_true", help="Return nonzero unless evaluation passes")
+
     probe = sub.add_parser("probe-media", help="Probe media streams with ffprobe and print JSON")
     probe.add_argument("input")
 
@@ -515,6 +530,26 @@ def main(argv: list[str] | None = None) -> int:
         )
         print(f"done: {output}")
         return 0
+
+    if args.command in ("eval", "evaluate"):
+        from .eval import evaluate_artifacts, write_eval_json, write_eval_markdown
+
+        report = evaluate_artifacts(
+            eval_id=args.eval_id,
+            plan_path=args.plan,
+            captions_path=args.captions,
+            frame_qc_path=args.frame_qc,
+            audio_qc_path=args.audio_qc,
+            export_validation_path=args.export_validation,
+        )
+        if args.json_out:
+            write_eval_json(report, args.json_out)
+        if args.md_out:
+            write_eval_markdown(report, args.md_out)
+        print(json.dumps(report.to_dict(), indent=2))
+        if args.strict:
+            return 0 if report.overall == "pass" else 1
+        return 1 if report.overall == "fail" else 0
 
     if args.command == "probe-media":
         from .probe import probe_media

@@ -30,7 +30,7 @@ Run the reproducible sample edit:
 python3 examples/quickstart/run.py
 ```
 
-The quickstart generates tiny media with `ffmpeg`, writes all artifacts under `examples/quickstart/out/`, and exercises the current loop: `init-edit` -> `add-source`/`add-asset` -> `propose-beat` -> `approve-beat` -> `compile-manifest` -> `render-cutaways` -> `verify-frames` -> `make-contact-sheet` -> `check-frames` -> `analyze-audio` -> `export-variant` -> `validate-export`.
+The quickstart generates tiny media with `ffmpeg`, writes all artifacts under `examples/quickstart/out/`, and exercises the current executable loop: `init-edit` -> `add-source`/`add-asset` -> `propose-beat` -> `approve-beat`/`reject-beat` -> `compile-manifest` -> `render-cutaways` -> `verify-frames` -> `make-contact-sheet` -> `check-frames` -> `analyze-audio` -> `export-variant` -> `validate-export` -> `eval`. It is intentionally local and deterministic: no reference video, stock media, or network sourcing is required.
 
 Generate lightweight archetype replica sketches for the two reference video formats:
 
@@ -39,7 +39,7 @@ python3 examples/archetypes/run.py --workdir /tmp/kino-archetypes
 kino plan-replica examples/archetypes/social-short/reference-analysis.json --json-out /tmp/kino-social-plan.json
 ```
 
-The archetype runner generates all media at runtime and writes intent-level `KINO-EDIT.json` plus `KINO-MANIFEST.json` skeletons for `social-short` and `founder-product-explainer`; no downloaded reference video is committed.
+The archetype runner adapts the checked-in `recipe.json` contracts into tiny synthetic media, writes intent-level `KINO-EDIT.json` plus executable `KINO-MANIFEST.json` skeletons for `social-short` and `founder-product-explainer`, and can optionally render those manifests with `--render`. No downloaded reference video is committed or required. Full-fidelity reference replication, live sourcing, and graph execution remain future work.
 
 Generate proposed beats from an edit state without exposing a manual timeline:
 
@@ -55,6 +55,14 @@ Plan and burn in transcript captions:
 kino plan-captions KINO-EDIT.json KINO-CAPTIONS.json --archetype social-short
 kino validate-captions KINO-CAPTIONS.json --edit KINO-EDIT.json
 kino render-captions input.mp4 KINO-CAPTIONS.json output.captioned.mp4
+```
+
+Aggregate plan, caption, frame, audio, and export checks into a single iteration scorecard:
+
+```bash
+kino eval --plan KINO-PLAN.json --captions KINO-CAPTIONS.json \
+  --frame-qc KINO-FRAME-QC.json --audio-qc KINO-AUDIO-QC.json \
+  --validation KINO-VALIDATION.json --out KINO-EVAL.json --md-out KINO-EVAL.md
 ```
 
 External tools used by real video workflows:
@@ -89,6 +97,7 @@ kino analyze-audio output.mp4 --json-out KINO-AUDIO-QC.json --md-out KINO-AUDIO-
 kino validate-export output.mp4 --preset vertical-social --json-out KINO-VALIDATION.json --md-out KINO-VALIDATION.md
 kino validate-export output.mp4 --preset vertical-social --strict
 kino export-variant output.mp4 output.vertical.mp4 --preset vertical-social
+kino eval --frame-qc KINO-FRAME-QC.json --audio-qc KINO-AUDIO-QC.json --validation KINO-VALIDATION.json --out KINO-EVAL.json --md-out KINO-EVAL.md
 ```
 
 ## Edit-Engine Foundation
@@ -99,6 +108,7 @@ Kino is moving in stages from a cutaway manifest to a graph-backed edit engine:
 - `KINO-EDIT.json` is the planning state initialized by `init-edit` for transcript tokens, source receipts, asset candidates, beat candidates, approvals, and rejections.
 - `KINO-PLAN.json` is the human-review artifact between transcript understanding and edit-state mutation. It contains proposed beats, token anchors, quote snippets, route classifications, interpretations, sourcing plans, asset fit scores, reasons, and confidence values without downloading media, approving taste decisions, or exposing a user-facing timeline.
 - `KINO-CAPTIONS.json` is the transcript-derived caption plan. It stores word-aligned caption segments, style presets, emphasized words, reasons, and confidence, then renders through `render-captions`.
+- `KINO-EVAL.json` is the build/test/refine scorecard. It aggregates plan quality, caption quality, frame QC, audio QC, and export validation into an overall status, score, decision, and next recommendations.
 - The second build target is a transcript-to-manifest planning loop: initialize an edit, propose beats from transcript ranges, approve or reject each candidate, then run `compile-manifest` to write the approved beats into `KINO-MANIFEST.json`.
 - Rendering still goes through `KINO-MANIFEST.json`: validate with `validate-manifest`, render with `render-cutaways`, inspect with `verify-frames`, and write QC artifacts with `make-contact-sheet`, `check-frames`, and `analyze-audio`.
 - The render graph is a typed intermediate representation for sources, tracks, clips, outputs, validation expectations, canonical JSON, and stable hashes.
@@ -125,6 +135,22 @@ kino render-captions input.mp4 KINO-CAPTIONS.json output.captioned.mp4
 ```
 
 `plan-captions` turns transcript word timings into caption segments using archetype-specific style presets. `validate-captions` checks readability, anchors, confidence bounds, and optional transcript hash parity. `render-captions` writes an ASS subtitle sidecar and burns it into the video with ffmpeg.
+
+### KINO-EVAL CLI
+
+```bash
+kino eval --plan KINO-PLAN.json --captions KINO-CAPTIONS.json \
+  --frame-qc KINO-FRAME-QC.json --audio-qc KINO-AUDIO-QC.json \
+  --validation KINO-VALIDATION.json --out KINO-EVAL.json --md-out KINO-EVAL.md
+```
+
+`eval` normalizes existing artifact checks into one release-readiness report. Default mode exits nonzero only on `fail`; `--strict` exits nonzero unless the decision is clean enough to pass without review.
+
+## Examples And Docs Contract
+
+- `examples/quickstart/` is the smoke-test sample for the current render/export/QC loop. It proves that approved `KINO-EDIT.json` beats compile to `KINO-MANIFEST.json`, render through cutaways, and produce verification, audio QC, export, and validation artifacts.
+- `examples/archetypes/` is the planning-contract sample for social shorts and founder product explainers. It proves that repo-safe archetype fixtures can be loaded, classified, planned with `plan-replica`, and materialized into synthetic edit/manifest skeletons without committing media blobs.
+- `KINO-PLAN.json` and `KINO-CAPTIONS.json` are review artifacts, and `KINO-EVAL.json` is the aggregate handoff artifact. Rendering still flows through `KINO-MANIFEST.json` until graph execution is implemented.
 
 ## Product Direction
 
