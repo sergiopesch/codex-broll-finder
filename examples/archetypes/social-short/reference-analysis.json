@@ -1,0 +1,68 @@
+{
+  "id": "youtube-shorts-jsBikM65h5w",
+  "duration": 27.934,
+  "platforms": ["YouTube Shorts", "TikTok", "Instagram Reels"],
+  "aspect_ratio": "9:16",
+  "pacing": "fast",
+  "primary_spine": "talking head with product proof inserts",
+  "visual_signals": [
+    "bold burned-in captions",
+    "hard cuts",
+    "product UI inserts",
+    "hardware/object proof",
+    "website CTA montage"
+  ],
+  "proof_signals": ["agent UI", "terminal/UI capture", "hardware closeup", "website montage"],
+  "cta": "Try the product and break it.",
+  "notes": [
+    "Reference only; no downloaded media, subtitles, or frames are committed.",
+    "Observed major scene changes: 1.30, 2.10, 3.63, 4.17, 4.60, 5.13, 6.20, 7.13, 8.73, 9.33, 11.47, 12.60, 14.73, 15.80, 16.07, 17.00, 17.57, 18.50, 19.67, 22.00, 23.00, 23.30 seconds."
+  ],
+  "transcript_cues": [
+    {
+      "id": "cue.hook",
+      "token_start": 0,
+      "token_end": 8,
+      "text": "Haters are right. Schematic sucks.",
+      "kind": "hook",
+      "confidence": 0.95,
+      "note": "Provocative opening tension."
+    },
+    {
+      "id": "cue.problem",
+      "token_start": 8,
+      "token_end": 28,
+      "text": "AI was terrible. It would introduce bugs. It did not know what parts to use.",
+      "kind": "problem",
+      "confidence": 0.92,
+      "note": "Confession/problem setup."
+    },
+    {
+      "id": "cue.claim",
+      "token_start": 28,
+      "token_end": 44,
+      "text": "We built a new agent from the ground up and it is much more accurate and faster.",
+      "kind": "claim",
+      "confidence": 0.91,
+      "note": "Fix or upgrade claim."
+    },
+    {
+      "id": "cue.proof",
+      "token_start": 44,
+      "token_end": 66,
+      "text": "To prove it, we prompted it to make a beat maker and got this within sixty seconds.",
+      "kind": "proof",
+      "confidence": 0.9,
+      "note": "Concrete demo/proof section."
+    },
+    {
+      "id": "cue.cta",
+      "token_start": 66,
+      "token_end": 86,
+      "text": "We redesigned our website. Go play with our AI and try to break it.",
+      "kind": "cta",
+      "confidence": 0.88,
+      "note": "CTA and product/site montage."
+    }
+  ]
+}

@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from kino import cli
@@ -53,6 +55,8 @@ def test_help_exposes_phase_1_commands(capsys):
         "make-contact-sheet",
         "check-frames",
         "list-presets",
+        "list-archetypes",
+        "plan-replica",
         "probe-media",
         "analyze-audio",
         "validate-export",
@@ -132,3 +136,53 @@ def test_edit_planning_cli_flow_compiles_manifest(tmp_path):
     assert manifest.beats[0].id == "beat001"
     assert manifest.beats[0].line == "Kino plans"
     assert manifest.beats[0].kind == "still"
+
+
+def test_list_archetypes_outputs_builtin_definitions(capsys):
+    assert cli.main(["list-archetypes"]) == 0
+    out = capsys.readouterr().out
+
+    assert "social-short" in out
+    assert "founder-product-explainer" in out
+
+
+def test_plan_replica_outputs_intent_level_beat_plan(tmp_path, capsys):
+    analysis = tmp_path / "analysis.json"
+    analysis.write_text(
+        json.dumps(
+            {
+                "id": "ref-social",
+                "duration": 28.0,
+                "platforms": ["YouTube Shorts"],
+                "aspect_ratio": "9:16",
+                "pacing": "fast",
+                "primary_spine": "talking head",
+                "visual_signals": ["bold burned-in captions", "hard cuts"],
+                "proof_signals": ["product UI"],
+                "transcript_cues": [
+                    {
+                        "id": "cue.hook",
+                        "token_start": 0,
+                        "token_end": 4,
+                        "text": "This is the hook.",
+                        "kind": "hook",
+                    },
+                    {
+                        "id": "cue.proof",
+                        "token_start": 4,
+                        "token_end": 8,
+                        "text": "Here is the proof.",
+                        "kind": "proof",
+                    },
+                ],
+            }
+        )
+    )
+    out = tmp_path / "KINO-REPLICA-PLAN.json"
+
+    assert cli.main(["plan-replica", str(analysis), "--json-out", str(out)]) == 0
+    data = json.loads(capsys.readouterr().out)
+
+    assert data["archetype_id"] == "social-short"
+    assert data["beats"][0]["role"] == "hook"
+    assert json.loads(out.read_text()) == data

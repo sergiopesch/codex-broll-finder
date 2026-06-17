@@ -1,0 +1,233 @@
+{
+  "recipe_schema_version": 1,
+  "id": "founder-product-explainer.reference-recipe",
+  "archetype": {
+    "id": "founder-product-explainer",
+    "name": "Founder Product Explainer",
+    "editorial_goal": "Turn founder footage, screen recordings, and product proof into a clear launch-style explainer with problem, promise, demo, proof, and CTA."
+  },
+  "reference": {
+    "url": "https://www.youtube.com/watch?v=Con4KzJsSmg",
+    "platform": "YouTube",
+    "media_policy": "Reference only. Do not commit downloaded video, audio, frames, subtitles, or screenshots.",
+    "notes": "Timing and cue text are lightweight observations for planning fixtures, not a complete transcript."
+  },
+  "target": {
+    "duration_seconds": {
+      "min": 60,
+      "max": 120,
+      "fixture": 80
+    },
+    "aspect_ratio": "16:9",
+    "master_size": [1920, 1080],
+    "fps": 30,
+    "platform_variants": ["youtube", "landing-page-embed", "product-hunt", "investor-update", "vertical-cutdown"],
+    "pacing": "compressed but understandable, with product UI held long enough to follow the workflow"
+  },
+  "observed_scene_timing": [
+    {
+      "id": "obs.cold-open",
+      "start": 0.0,
+      "end": 6.0,
+      "section": "cold_open",
+      "primary_visual": "surprising result or product outcome before context",
+      "purpose": "earn attention by showing the outcome first"
+    },
+    {
+      "id": "obs.origin-problem",
+      "start": 6.0,
+      "end": 24.0,
+      "section": "origin_problem",
+      "primary_visual": "founder-led explanation with selective inserts",
+      "purpose": "establish why the product exists and who feels the pain"
+    },
+    {
+      "id": "obs.positioning",
+      "start": 24.0,
+      "end": 36.0,
+      "section": "positioning",
+      "primary_visual": "founder plus product framing or simple UI proof",
+      "purpose": "state the product promise in plain terms"
+    },
+    {
+      "id": "obs.walkthrough",
+      "start": 36.0,
+      "end": 56.0,
+      "section": "walkthrough",
+      "primary_visual": "screen recording with optional face-camera picture-in-picture",
+      "purpose": "show the core workflow end to end"
+    },
+    {
+      "id": "obs.physical-proof",
+      "start": 56.0,
+      "end": 72.0,
+      "section": "physical_proof",
+      "primary_visual": "real-world object, result, or physical validation shot",
+      "purpose": "make the claim feel grounded outside the UI"
+    },
+    {
+      "id": "obs.cta",
+      "start": 72.0,
+      "end": 80.0,
+      "section": "cta",
+      "primary_visual": "clean final product or site CTA",
+      "purpose": "tell the viewer the next action"
+    }
+  ],
+  "structure_sections": [
+    {
+      "id": "cold_open",
+      "label": "Cold Open Result",
+      "target_range_seconds": [0.0, 6.0],
+      "intent": "Show the surprising result before explaining the backstory.",
+      "visual_strategy": "Start on outcome proof, then quickly reconnect to the founder spine.",
+      "planning_primitives": ["narrative_arc_planner", "result_shot_selector"]
+    },
+    {
+      "id": "origin_problem",
+      "label": "Origin And User Problem",
+      "target_range_seconds": [6.0, 24.0],
+      "intent": "Explain the motivation and user pain with enough context to trust the product.",
+      "visual_strategy": "Use founder talking head as spine, with inserts only where they clarify the problem.",
+      "planning_primitives": ["speech_compression", "problem_statement_detector"]
+    },
+    {
+      "id": "positioning",
+      "label": "Product Positioning",
+      "target_range_seconds": [24.0, 36.0],
+      "intent": "State the promise and category clearly.",
+      "visual_strategy": "Show the product surface, brand/site, or simple before-to-after system view.",
+      "planning_primitives": ["product_positioning_detector", "caption_planner_clarity"]
+    },
+    {
+      "id": "walkthrough",
+      "label": "Live Product Walkthrough",
+      "target_range_seconds": [36.0, 56.0],
+      "intent": "Demonstrate the core workflow without losing continuity.",
+      "visual_strategy": "Use readable screen capture, visible cursor/action states, and optional facecam picture-in-picture.",
+      "planning_primitives": ["screen_recording_selector", "crop_planner", "pip_facecam_layout", "demo_step_detector"]
+    },
+    {
+      "id": "physical_proof",
+      "label": "Physical Or Result Proof",
+      "target_range_seconds": [56.0, 72.0],
+      "intent": "Validate the product claim with something observable beyond talking.",
+      "visual_strategy": "Use real object footage, result stills, customer proof, or output examples.",
+      "planning_primitives": ["proof_shot_selector", "demo_continuity_qc"]
+    },
+    {
+      "id": "cta",
+      "label": "Clean CTA",
+      "target_range_seconds": [72.0, 80.0],
+      "intent": "Close with a direct next step.",
+      "visual_strategy": "Hold a readable site/product frame and avoid adding new conceptual load.",
+      "planning_primitives": ["cta_selector", "master_and_cutdown_compiler"]
+    }
+  ],
+  "transcript_cue_snippets": [
+    {
+      "id": "cue.cold-open",
+      "time_range": [0.0, 5.46],
+      "snippet": "This is the result I wanted before I knew what to build.",
+      "section": "cold_open",
+      "caption_emphasis": ["result", "what to build"],
+      "proof_requirement": "Open on the result or generated output, not the setup."
+    },
+    {
+      "id": "cue.origin-problem",
+      "time_range": [7.0, 21.92],
+      "snippet": "I kept losing the story between customer calls, product notes, and screen recordings.",
+      "section": "origin_problem",
+      "caption_emphasis": ["losing the story"],
+      "proof_requirement": "Use founder spine plus quick inserts for notes, calls, or raw recordings."
+    },
+    {
+      "id": "cue.positioning",
+      "time_range": [24.0, 33.94],
+      "snippet": "So we built Kino to plan the edit from intent, not from a blank timeline.",
+      "section": "positioning",
+      "caption_emphasis": ["intent", "blank timeline"],
+      "proof_requirement": "Show product positioning surface or planning UI."
+    },
+    {
+      "id": "cue.walkthrough",
+      "time_range": [36.0, 52.92],
+      "snippet": "I drop in the transcript, approve the beats, and the demo compiles into a render plan.",
+      "section": "walkthrough",
+      "caption_emphasis": ["approve the beats", "render plan"],
+      "proof_requirement": "Show screen recording of transcript, beat approval, and manifest/render plan."
+    },
+    {
+      "id": "cue.physical-proof",
+      "time_range": [56.0, 68.94],
+      "snippet": "Then the proof shots make the launch claim feel real.",
+      "section": "physical_proof",
+      "caption_emphasis": ["proof shots", "feel real"],
+      "proof_requirement": "Show physical or output proof tied to the launch claim."
+    },
+    {
+      "id": "cue.cta",
+      "time_range": [72.0, 78.86],
+      "snippet": "Start with a recipe, bring your footage, and ship the explainer.",
+      "section": "cta",
+      "caption_emphasis": ["recipe", "ship"],
+      "proof_requirement": "Hold final CTA on readable product/site frame."
+    }
+  ],
+  "replica_plan": {
+    "inputs": [
+      {
+        "id": "input.founder-spine",
+        "kind": "video",
+        "required": true,
+        "description": "User-owned founder talking-head footage with word-aligned transcript."
+      },
+      {
+        "id": "input.screen-recordings",
+        "kind": "video",
+        "required": true,
+        "description": "Readable product walkthrough recordings showing workflow steps."
+      },
+      {
+        "id": "input.facecam",
+        "kind": "video",
+        "required": false,
+        "description": "Optional face-camera recording for picture-in-picture during the walkthrough."
+      },
+      {
+        "id": "input.proof-shots",
+        "kind": "video_or_still",
+        "required": true,
+        "description": "Physical product, output, result, customer, or other real-world validation shots."
+      }
+    ],
+    "planner_outputs": [
+      "KINO-EDIT.json with narrative arc beats and selected proof assets",
+      "KINO-MANIFEST.json for the 16:9 master",
+      "vertical cutdown plan derived from the same approved story beats",
+      "picture-in-picture layout plan for facecam plus screen capture",
+      "demo continuity QC report",
+      "source receipt and proof map for every claim"
+    ],
+    "expected_core_flow": [
+      "load KINO-EDIT.json",
+      "validate transcript, source receipts, asset candidates, and beat candidates",
+      "compile approved beats into KINO-MANIFEST.json",
+      "render master and variants with caller-provided media that resolves placeholder URIs"
+    ]
+  },
+  "core_consumable_fixtures": [
+    {
+      "path": "KINO-EDIT.json",
+      "format": "KINO-EDIT v2",
+      "consumer": "kino.edit.KinoEdit.from_json and kino.compile.compile_edit_to_manifest"
+    }
+  ],
+  "quality_gates": [
+    "No committed binary media or downloaded reference assets.",
+    "The problem, promise, walkthrough, proof, and CTA are all represented as separate sections.",
+    "Every major claim has visible UI proof, physical proof, or spoken-context fallback.",
+    "Screen recordings remain readable in 16:9 and have a declared vertical cutdown strategy.",
+    "Approved beat token ranges are sorted and non-overlapping after manifest compilation."
+  ]
+}

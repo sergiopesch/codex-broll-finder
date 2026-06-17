@@ -6,6 +6,8 @@ Kino should not expose a timeline as the user interface. The user should express
 
 This document captures real video formats Kino should learn to produce. Each archetype defines the editorial grammar the agent should plan, render, verify, and iterate.
 
+Machine-readable fixtures live under `examples/archetypes/`. Use `kino list-archetypes` to inspect built-in templates, `kino plan-replica examples/archetypes/<id>/reference-analysis.json` to produce an intent-level beat plan, and `python3 examples/archetypes/run.py --workdir /tmp/kino-archetypes` to generate tiny synthetic replica skeletons without committing reference media.
+
 ## 1. Social Short
 
 Reference example: `https://youtube.com/shorts/jsBikM65h5w`
@@ -123,4 +125,3 @@ These two archetypes point to the next foundation:
 4. Proof sourcing and source receipts for claims.
 5. Review artifacts: beat plan, contact sheet, caption frames, proof map, QC reports.
 6. Platform variants from the same approved intent, not separate manual edits.
-

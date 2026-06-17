@@ -128,6 +128,15 @@ def main(argv: list[str] | None = None) -> int:
     presets = sub.add_parser("list-presets", help="List built-in social export presets")
     presets.add_argument("--json", action="store_true")
 
+    archetypes = sub.add_parser("list-archetypes", help="List built-in intent-level video archetypes")
+    archetypes.add_argument("--json", action="store_true")
+
+    replica = sub.add_parser("plan-replica", help="Plan a replica beat structure from reference analysis JSON")
+    replica.add_argument("analysis")
+    replica.add_argument("--archetype", choices=["social-short", "founder-product-explainer"])
+    replica.add_argument("--target-duration", type=float)
+    replica.add_argument("--json-out")
+
     probe = sub.add_parser("probe-media", help="Probe media streams with ffprobe and print JSON")
     probe.add_argument("input")
 
@@ -391,6 +400,29 @@ def main(argv: list[str] | None = None) -> int:
         else:
             for preset in PRESETS.values():
                 print(f"{preset.name}: {preset.width}x{preset.height} {preset.ratio} {preset.video_codec}/{preset.audio_codec}")
+        return 0
+
+    if args.command == "list-archetypes":
+        from .archetypes import default_archetype_definitions
+
+        definitions = default_archetype_definitions()
+        if args.json:
+            print(json.dumps({key: definition.to_dict() for key, definition in definitions.items()}, indent=2))
+        else:
+            for definition in definitions.values():
+                low, high = definition.duration_range
+                print(f"{definition.id}: {definition.name} {low:g}-{high:g}s {', '.join(definition.aspect_ratios)}")
+        return 0
+
+    if args.command == "plan-replica":
+        from .archetypes import load_reference_analysis_json, plan_replica_beats
+
+        analysis = load_reference_analysis_json(args.analysis)
+        plan = plan_replica_beats(analysis, archetype_id=args.archetype, target_duration=args.target_duration)
+        data = plan.to_dict()
+        if args.json_out:
+            Path(args.json_out).write_text(json.dumps(data, indent=2) + "\n")
+        print(json.dumps(data, indent=2))
         return 0
 
     if args.command == "probe-media":

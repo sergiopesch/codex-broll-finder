@@ -65,6 +65,8 @@ Primary commands:
 - `make-contact-sheet`: build a labeled visual grid from extracted verification frames.
 - `check-frames`: write JSON/Markdown frame QC reports for missing, tiny, black, or frozen-looking frames.
 - `list-presets`: list built-in social export presets.
+- `list-archetypes`: list built-in intent-level video archetypes such as social shorts and founder product explainers.
+- `plan-replica`: compile reference-analysis JSON into an intent-level replica beat plan.
 - `probe-media`: inspect output streams with `ffprobe`.
 - `analyze-audio`: write JSON/Markdown audio QC reports for stream metadata, clipping risk, and silence gaps.
 - `validate-export`: validate output against a social export preset and write JSON/Markdown reports.

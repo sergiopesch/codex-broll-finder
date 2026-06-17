@@ -28,6 +28,7 @@ Phase 1 includes:
 - typed render graph data structures and conversion from the current cutaway manifest
 - render receipts for successful cutaway renders
 - a reproducible `examples/quickstart/` sample that generates tiny media at runtime and exercises the full current loop
+- archetype reference fixtures and synthetic replica skeletons for social-short and founder-product-explainer formats
 - repo-local plugin scaffold validation, including bundled skill and helper source
 
 Phase 1 does not yet include:
@@ -40,6 +41,7 @@ Phase 1 does not yet include:
 - caption rendering
 - loudness normalization
 - safe-zone geometry checks
+- full-fidelity replication of reference videos
 - marketplace install/reinstall flow
 
 ## Edit-Engine Foundation
