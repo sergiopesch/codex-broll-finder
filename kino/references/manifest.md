@@ -6,6 +6,8 @@ Use `KINO-MANIFEST.json` as the current executable source of truth for Phase 1 c
 
 `KINO-PLAN.json` is the review artifact between transcript understanding and edit-state mutation. It lets Codex propose beat choices for approval before sourcing media, changing `KINO-EDIT.json`, or compiling a renderable manifest.
 
+`KINO-CAPTIONS.json` is the transcript-derived caption artifact. It stores word-aligned caption segments, style presets, emphasized words, reasons, and confidence before ffmpeg burns captions into a rendered video.
+
 ## Current Cutaway Manifest
 
 ```json
@@ -155,6 +157,55 @@ The CLI contract is:
 3. `apply-plan KINO-PLAN.json KINO-EDIT.json` imports validated proposed beats into `KINO-EDIT.json` without sourcing assets, approving taste decisions, or compiling render output.
 
 Current rendering still starts from `KINO-MANIFEST.json`.
+
+## KINO-CAPTIONS Shape
+
+`KINO-CAPTIONS.json` is generated from `KINO-EDIT.json` transcript words and an archetype:
+
+```json
+{
+  "version": 1,
+  "schema": "kino.captions.v1",
+  "id": "demo:social-short:captions",
+  "edit_id": "demo",
+  "transcript_id": "tx001",
+  "transcript_hash": "sha256:...",
+  "archetype_id": "social-short",
+  "style": {
+    "preset": "social-short-bold",
+    "font": "Arial",
+    "font_size": 64,
+    "alignment": 2,
+    "margin_v": 150,
+    "max_chars_per_line": 18,
+    "max_lines": 2,
+    "uppercase": true
+  },
+  "segments": [
+    {
+      "id": "cap:001",
+      "anchor": {
+        "token_start": 0,
+        "token_end": 5,
+        "word_start_id": "w001",
+        "word_end_id": "w005"
+      },
+      "start": 0.0,
+      "end": 1.2,
+      "text": "THIS MISTAKE COST A WEEK",
+      "emphasized_words": ["mistake"],
+      "confidence": 0.89,
+      "reasons": ["Caption timing is derived from word alignment."]
+    }
+  ]
+}
+```
+
+The CLI contract is:
+
+1. `plan-captions KINO-EDIT.json KINO-CAPTIONS.json --archetype social-short` creates readable word-aligned caption segments.
+2. `validate-captions KINO-CAPTIONS.json --edit KINO-EDIT.json` checks readability, token anchors, transcript hash parity, and confidence bounds.
+3. `render-captions input.mp4 KINO-CAPTIONS.json output.captioned.mp4` writes an ASS sidecar and burns captions into the video.
 
 ## Transcript-To-Manifest Planning
 

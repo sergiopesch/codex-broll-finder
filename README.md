@@ -49,6 +49,14 @@ kino validate-plan KINO-PLAN.json
 kino apply-plan KINO-PLAN.json KINO-EDIT.json --out KINO-EDIT.json
 ```
 
+Plan and burn in transcript captions:
+
+```bash
+kino plan-captions KINO-EDIT.json KINO-CAPTIONS.json --archetype social-short
+kino validate-captions KINO-CAPTIONS.json --edit KINO-EDIT.json
+kino render-captions input.mp4 KINO-CAPTIONS.json output.captioned.mp4
+```
+
 External tools used by real video workflows:
 
 - `ffmpeg` and `ffprobe`
@@ -90,6 +98,7 @@ Kino is moving in stages from a cutaway manifest to a graph-backed edit engine:
 - `KINO-MANIFEST.json` remains the supported Phase 1 execution input.
 - `KINO-EDIT.json` is the planning state initialized by `init-edit` for transcript tokens, source receipts, asset candidates, beat candidates, approvals, and rejections.
 - `KINO-PLAN.json` is the human-review artifact between transcript understanding and edit-state mutation. It contains proposed beats, token anchors, quote snippets, route classifications, interpretations, sourcing plans, asset fit scores, reasons, and confidence values without downloading media, approving taste decisions, or exposing a user-facing timeline.
+- `KINO-CAPTIONS.json` is the transcript-derived caption plan. It stores word-aligned caption segments, style presets, emphasized words, reasons, and confidence, then renders through `render-captions`.
 - The second build target is a transcript-to-manifest planning loop: initialize an edit, propose beats from transcript ranges, approve or reject each candidate, then run `compile-manifest` to write the approved beats into `KINO-MANIFEST.json`.
 - Rendering still goes through `KINO-MANIFEST.json`: validate with `validate-manifest`, render with `render-cutaways`, inspect with `verify-frames`, and write QC artifacts with `make-contact-sheet`, `check-frames`, and `analyze-audio`.
 - The render graph is a typed intermediate representation for sources, tracks, clips, outputs, validation expectations, canonical JSON, and stable hashes.
@@ -106,6 +115,16 @@ kino apply-plan KINO-PLAN.json KINO-EDIT.json --out KINO-EDIT.json
 ```
 
 `plan-edit` reads transcript, source, and asset state from `KINO-EDIT.json`, chooses archetype sections, scores matching assets, and writes proposed beats with reasons and confidence. `validate-plan` is the schema/editorial gate. `apply-plan` imports validated beats into `KINO-EDIT.json` as `proposed` while preserving plan rationale metadata; rendering still requires explicit approval and `compile-manifest`.
+
+### KINO-CAPTIONS CLI
+
+```bash
+kino plan-captions KINO-EDIT.json KINO-CAPTIONS.json --archetype social-short
+kino validate-captions KINO-CAPTIONS.json --edit KINO-EDIT.json
+kino render-captions input.mp4 KINO-CAPTIONS.json output.captioned.mp4
+```
+
+`plan-captions` turns transcript word timings into caption segments using archetype-specific style presets. `validate-captions` checks readability, anchors, confidence bounds, and optional transcript hash parity. `render-captions` writes an ASS subtitle sidecar and burns it into the video with ffmpeg.
 
 ## Product Direction
 

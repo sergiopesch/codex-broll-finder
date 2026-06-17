@@ -6,6 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 def test_plugin_mirrors_kino_planner_runtime_files():
     for relative in (
+        "src/kino/captions.py",
         "src/kino/plan.py",
         "src/kino/edit.py",
         "src/kino/cli.py",

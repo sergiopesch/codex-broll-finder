@@ -60,6 +60,9 @@ def test_help_exposes_phase_1_commands(capsys):
         "plan-edit",
         "validate-plan",
         "apply-plan",
+        "plan-captions",
+        "validate-captions",
+        "render-captions",
         "probe-media",
         "analyze-audio",
         "validate-export",
@@ -177,6 +180,58 @@ def test_apply_plan_imports_proposed_beats_into_edit(tmp_path):
     assert all(beat["plan_id"] == "edit001:founder-product-explainer:plan" for beat in data["beats"])
     assert all(beat["confidence"] > 0 for beat in data["beats"])
     assert all(beat["reasons"] for beat in data["beats"])
+
+
+def test_caption_cli_flow_plans_validates_and_renders(tmp_path, monkeypatch, capsys):
+    transcript = tmp_path / "transcript.json"
+    edit = tmp_path / "KINO-EDIT.json"
+    captions = tmp_path / "KINO-CAPTIONS.json"
+    output = tmp_path / "captioned.mp4"
+    transcript.write_text(
+        json.dumps(
+            {
+                "id": "tx001",
+                "language": "en",
+                "source": "input.mp4",
+                "words": [
+                    {"id": "w001", "text": "This", "start": 0.0, "end": 0.25},
+                    {"id": "w002", "text": "mistake", "start": 0.25, "end": 0.6},
+                    {"id": "w003", "text": "cost", "start": 0.6, "end": 0.9},
+                    {"id": "w004", "text": "a", "start": 0.9, "end": 1.0},
+                    {"id": "w005", "text": "week", "start": 1.0, "end": 1.25},
+                    {"id": "w006", "text": "watch", "start": 1.25, "end": 1.5},
+                    {"id": "w007", "text": "the", "start": 1.5, "end": 1.6},
+                    {"id": "w008", "text": "demo", "start": 1.6, "end": 2.0},
+                ],
+            }
+        )
+    )
+
+    commands = []
+
+    def fake_run(command):
+        commands.append(command)
+        output.write_bytes(b"video")
+
+    monkeypatch.setattr("kino.captions.run", fake_run)
+
+    assert cli.main(["init-edit", str(transcript), str(edit), "--id", "edit001"]) == 0
+    capsys.readouterr()
+    assert cli.main(["plan-captions", str(edit), str(captions), "--archetype", "social-short"]) == 0
+    data = json.loads(capsys.readouterr().out)
+
+    assert data["schema"] == "kino.captions.v1"
+    assert data["style"]["preset"] == "social-short-bold"
+    assert data["segments"][0]["text"] == "THIS MISTAKE COST A WEEK"
+    assert json.loads(captions.read_text()) == data
+
+    assert cli.main(["validate-captions", str(captions), "--edit", str(edit)]) == 0
+    assert "ok:" in capsys.readouterr().out
+    assert cli.main(["render-captions", "input.mp4", str(captions), str(output), "--size", "1080x1920"]) == 0
+
+    assert output.exists()
+    assert (tmp_path / "captioned.ass").exists()
+    assert commands
 
 
 def test_edit_planning_cli_flow_compiles_manifest(tmp_path):

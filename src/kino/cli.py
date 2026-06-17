@@ -151,6 +151,22 @@ def main(argv: list[str] | None = None) -> int:
     apply_plan.add_argument("edit")
     apply_plan.add_argument("--out")
 
+    plan_captions = sub.add_parser("plan-captions", help="Create KINO-CAPTIONS.json from KINO-EDIT transcript state")
+    plan_captions.add_argument("edit")
+    plan_captions.add_argument("captions")
+    plan_captions.add_argument("--archetype", required=True, choices=["social-short", "founder-product-explainer"])
+
+    validate_captions = sub.add_parser("validate-captions", help="Parse and validate KINO-CAPTIONS.json")
+    validate_captions.add_argument("captions")
+    validate_captions.add_argument("--edit", help="Also validate transcript hash and word anchors against KINO-EDIT.json")
+
+    render_captions = sub.add_parser("render-captions", help="Burn KINO-CAPTIONS.json onto a video")
+    render_captions.add_argument("input")
+    render_captions.add_argument("captions")
+    render_captions.add_argument("output")
+    render_captions.add_argument("--ass-out", help="Write/use this ASS subtitle sidecar path")
+    render_captions.add_argument("--size", default="1080x1920")
+
     probe = sub.add_parser("probe-media", help="Probe media streams with ffprobe and print JSON")
     probe.add_argument("input")
 
@@ -465,6 +481,39 @@ def main(argv: list[str] | None = None) -> int:
         updated = apply_plan_to_edit(load_edit(args.edit), load_plan(args.plan))
         out = write_edit_json(updated, _edit_out_path(args.edit, args.out))
         print(f"done: {out}")
+        return 0
+
+    if args.command == "plan-captions":
+        from .captions import plan_captions, write_captions_json
+        from .edit import load_edit
+
+        captions = plan_captions(load_edit(args.edit), archetype_id=args.archetype)
+        write_captions_json(captions, args.captions)
+        print(json.dumps(captions.to_dict(), indent=2))
+        return 0
+
+    if args.command == "validate-captions":
+        from .captions import load_captions, validate_captions_for_edit
+
+        captions = load_captions(args.captions)
+        if args.edit:
+            from .edit import load_edit
+
+            validate_captions_for_edit(captions, load_edit(args.edit))
+        print(f"ok: {len(captions.segments)} captions")
+        return 0
+
+    if args.command == "render-captions":
+        from .captions import load_captions, render_captions
+
+        output = render_captions(
+            args.input,
+            load_captions(args.captions),
+            args.output,
+            ass_path=args.ass_out,
+            size=_parse_size(args.size),
+        )
+        print(f"done: {output}")
         return 0
 
     if args.command == "probe-media":

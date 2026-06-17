@@ -41,6 +41,8 @@ Use `plan-edit` to generate `KINO-PLAN.json`, `validate-plan` to gate it, and `a
 
 Before sourcing, check the palette. If more than 60% of planned beats are website screenshots, revise the plan unless the script is explicitly receipt-heavy.
 
+For shorts, reels, and explainer clips, plan captions as part of the edit language. Use `plan-captions` to create `KINO-CAPTIONS.json`, `validate-captions` to check readability and transcript anchors, and `render-captions` to burn captions into the video after the underlying cut is ready.
+
 ## References
 
 Load only the file needed for the current step:
@@ -62,6 +64,7 @@ python3 kino/scripts/kino_tool.py --help
 Primary commands:
 
 - `plan-edit`, `validate-plan`, and `apply-plan`: create, validate, and import `KINO-PLAN.json` proposed beats.
+- `plan-captions`, `validate-captions`, and `render-captions`: create, validate, and burn in `KINO-CAPTIONS.json`.
 - `init-edit`: create `KINO-EDIT.json` from transcript JSON.
 - `propose-beat`, `approve-beat`, `reject-beat`, and `compile-manifest`: maintain planning state and compile approved beats to `KINO-MANIFEST.json`.
 - `validate-manifest`: parse and check `KINO-MANIFEST.json`.
