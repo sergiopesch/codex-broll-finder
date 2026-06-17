@@ -19,8 +19,9 @@ The agent narrows the funnel; the user makes taste calls. For objective routes, 
 4. **Source by origin**: after approval, group beats by source so one website capture or official video can cover several beats.
 5. **Format assets**: output silent, full-bleed clips. Use the bundled tool for still zooms, page captures, validation, and cutaway renders.
 6. **Maintain state**: keep a `KINO-MANIFEST.json` for machine execution and a short `KINO-MANIFEST.md` for human review. Approved beats must not disappear between renders.
-7. **Verify visually**: extract midpoint and joint frames after each render, inspect them, and fix rejected frames before presenting the result.
-8. **Export and validate**: create requested platform variants, run `validate-export`, and include `KINO-VALIDATION.json` plus `KINO-VALIDATION.md` with the handoff.
+7. **Verify visually**: extract midpoint and joint frames after each render, generate a contact sheet, run frame QC, inspect the result, and fix rejected frames before presenting the render.
+8. **Check audio**: run audio QC on the rendered master or final export before handoff.
+9. **Export and validate**: create requested platform variants, run `validate-export`, and include `KINO-VALIDATION.json` plus `KINO-VALIDATION.md` with the handoff.
 
 ## Planning Contract
 
@@ -61,8 +62,11 @@ Primary commands:
 - `capture-page`: capture a public page or tweet embed with headless Chrome/Chromium.
 - `render-cutaways`: replace base-video visuals during beat windows while preserving base audio.
 - `verify-frames`: extract beat midpoint and transition frames for inspection.
+- `make-contact-sheet`: build a labeled visual grid from extracted verification frames.
+- `check-frames`: write JSON/Markdown frame QC reports for missing, tiny, black, or frozen-looking frames.
 - `list-presets`: list built-in social export presets.
 - `probe-media`: inspect output streams with `ffprobe`.
+- `analyze-audio`: write JSON/Markdown audio QC reports for stream metadata, clipping risk, and silence gaps.
 - `validate-export`: validate output against a social export preset and write JSON/Markdown reports.
 - `export-variant`: render a platform-specific variant from a finished edit.
 

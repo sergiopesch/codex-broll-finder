@@ -61,6 +61,26 @@ Current automated checks:
 - 48 kHz audio sample rate, if audio exists
 - fast-start MP4 atom order when the file is available
 
+## Analyze Audio
+
+Run audio QC on the rendered master or final export:
+
+```bash
+python3 kino/scripts/kino_tool.py analyze-audio output.mp4 \
+  --json-out KINO-AUDIO-QC.json \
+  --md-out KINO-AUDIO-QC.md
+```
+
+Treat `fail` as blocking. Treat `warning` as a visible handoff item; missing audio can be intentional for silent exports but should not be hidden.
+
+Current automated checks:
+
+- audio stream presence
+- sample rate and channel metadata
+- expected 48 kHz sample rate by default
+- clipping risk from `ffmpeg` max volume
+- silence gaps from `ffmpeg` silence detection
+
 ## Export Variant
 
 Run:

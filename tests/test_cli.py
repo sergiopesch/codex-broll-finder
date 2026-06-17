@@ -50,8 +50,11 @@ def test_help_exposes_phase_1_commands(capsys):
         "validate-manifest",
         "render-cutaways",
         "verify-frames",
+        "make-contact-sheet",
+        "check-frames",
         "list-presets",
         "probe-media",
+        "analyze-audio",
         "validate-export",
         "export-variant",
     ):

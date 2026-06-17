@@ -28,8 +28,8 @@ def test_quickstart_runner_invokes_cli_loop_after_generating_media(tmp_path, mon
 
     monkeypatch.setattr(module.shutil, "which", lambda tool: f"/usr/bin/{tool}")
 
-    def fake_run(command, *, cwd, env=None, capture_output=False, text=False):
-        calls.append((list(command), Path(cwd)))
+    def fake_run(command, *, cwd=None, env=None, capture_output=False, text=False):
+        calls.append((list(command), Path(cwd) if cwd is not None else Path()))
         return subprocess.CompletedProcess(command, 0, stdout="ok", stderr="")
 
     monkeypatch.setattr(module.subprocess, "run", fake_run)
@@ -54,8 +54,33 @@ def test_quickstart_runner_invokes_cli_loop_after_generating_media(tmp_path, mon
         "compile-manifest",
         "render-cutaways",
         "verify-frames",
+        "make-contact-sheet",
+        "check-frames",
+        "analyze-audio",
         "export-variant",
         "validate-export",
+    ]
+    assert cli_calls[-5][3:] == ["make-contact-sheet", "verify_frames", "KINO-CONTACT-SHEET.jpg"]
+    assert cli_calls[-4][3:] == [
+        "check-frames",
+        "verify_frames",
+        "--manifest",
+        "KINO-MANIFEST.json",
+        "--json-out",
+        "KINO-FRAME-QC.json",
+        "--md-out",
+        "KINO-FRAME-QC.md",
+        "--contact-sheet",
+        "KINO-CONTACT-SHEET.jpg",
+    ]
+    assert cli_calls[-3][3:] == [
+        "analyze-audio",
+        "rendered.mp4",
+        "--json-out",
+        "KINO-AUDIO-QC.json",
+        "--md-out",
+        "KINO-AUDIO-QC.md",
+        "--strict",
     ]
     assert cli_calls[-2][-4:] == ["--preset", "landscape-web", "--crf", "28"]
     assert cli_calls[-1][-5:] == [
@@ -76,6 +101,22 @@ def test_quickstart_runner_reports_missing_ffmpeg(tmp_path, monkeypatch):
         module.run_quickstart(tmp_path)
 
 
+def test_quickstart_runner_reports_missing_python_dependency(tmp_path, monkeypatch):
+    module = _load_quickstart()
+
+    monkeypatch.setattr(module.shutil, "which", lambda tool: f"/usr/bin/{tool}")
+
+    def fake_run(command, *, cwd=None, env=None, capture_output=False, text=False):
+        if command[:2] == ["/python", "-c"]:
+            return subprocess.CompletedProcess(command, 1, stdout="", stderr="ModuleNotFoundError")
+        return subprocess.CompletedProcess(command, 0, stdout="ok", stderr="")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+
+    with pytest.raises(module.QuickstartError, match="missing required Python module"):
+        module.run_quickstart(tmp_path, python="/python", repo_root=ROOT)
+
+
 @pytest.mark.skipif(
     not shutil.which("ffmpeg") or not shutil.which("ffprobe"),
     reason="ffmpeg and ffprobe are required for the quickstart smoke test",
@@ -89,6 +130,11 @@ def test_quickstart_runner_real_tiny_media_smoke(tmp_path):
     assert outputs["manifest"].exists()
     assert outputs["render"].exists()
     assert outputs["render_receipt"].exists()
+    assert outputs["contact_sheet"].exists()
+    assert outputs["frame_qc_json"].exists()
+    assert outputs["frame_qc_md"].exists()
+    assert outputs["audio_qc_json"].exists()
+    assert outputs["audio_qc_md"].exists()
     assert outputs["export"].exists()
     assert outputs["validation_json"].exists()
     assert any(outputs["verify_frames"].glob("*.jpg"))

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import json
+import sys
 from pathlib import Path
 
 from .manifest import load_manifest
@@ -106,11 +108,39 @@ def main(argv: list[str] | None = None) -> int:
     frames.add_argument("--source")
     frames.add_argument("--out-dir")
 
+    sheet = sub.add_parser("make-contact-sheet", help="Create a labeled contact sheet from verification frames")
+    sheet.add_argument("frames_dir")
+    sheet.add_argument("output")
+    sheet.add_argument("--columns", type=int, default=4)
+    sheet.add_argument("--thumb-size", default="320x180")
+
+    check_frames = sub.add_parser("check-frames", help="Run automated QC checks over verification frames")
+    check_frames.add_argument("frames_dir")
+    check_frames.add_argument("--manifest", help="Use manifest beat timings to define expected frame names")
+    check_frames.add_argument("--json-out")
+    check_frames.add_argument("--md-out")
+    check_frames.add_argument("--contact-sheet")
+    check_frames.add_argument("--min-bytes", type=int, default=512)
+    check_frames.add_argument("--black-luma-threshold", type=float, default=8.0)
+    check_frames.add_argument("--near-identical-threshold", type=float, default=1.5)
+    check_frames.add_argument("--strict", action="store_true", help="Return nonzero unless every check passes")
+
     presets = sub.add_parser("list-presets", help="List built-in social export presets")
     presets.add_argument("--json", action="store_true")
 
     probe = sub.add_parser("probe-media", help="Probe media streams with ffprobe and print JSON")
     probe.add_argument("input")
+
+    audio_qc = sub.add_parser("analyze-audio", help="Run audio QC checks over rendered or exported media")
+    audio_qc.add_argument("input")
+    audio_qc.add_argument("--expected-sample-rate", type=int, default=48000)
+    audio_qc.add_argument("--expected-channels", type=int)
+    audio_qc.add_argument("--clipping-threshold-db", type=float, default=-0.1)
+    audio_qc.add_argument("--silence-noise-db", type=float, default=-50.0)
+    audio_qc.add_argument("--silence-min-duration", type=float, default=1.0)
+    audio_qc.add_argument("--json-out")
+    audio_qc.add_argument("--md-out")
+    audio_qc.add_argument("--strict", action="store_true", help="Return nonzero unless every check passes")
 
     validate_export = sub.add_parser("validate-export", help="Validate an export against a preset")
     validate_export.add_argument("input")
@@ -308,9 +338,54 @@ def main(argv: list[str] | None = None) -> int:
         print(f"done: {out_dir}")
         return 0
 
-    if args.command == "list-presets":
-        import json
+    if args.command == "make-contact-sheet":
+        from .qc import frame_expectations_from_dir, generate_contact_sheet
 
+        frames = frame_expectations_from_dir(args.frames_dir)
+        if not frames:
+            print(f"error: no verification frames found in {args.frames_dir}", file=sys.stderr)
+            return 1
+        out = generate_contact_sheet(frames, args.output, columns=args.columns, thumb_size=_parse_size(args.thumb_size))
+        print(f"done: {out}")
+        return 0
+
+    if args.command == "check-frames":
+        from .qc import (
+            expected_frame_paths,
+            frame_expectations_from_dir,
+            verify_frames,
+            write_frame_qc_json,
+            write_frame_qc_markdown,
+        )
+
+        if args.manifest:
+            from .video import verification_times
+
+            labels = [label for label, _ in verification_times(load_manifest(args.manifest))]
+            frames = expected_frame_paths(args.frames_dir, labels)
+        else:
+            frames = frame_expectations_from_dir(args.frames_dir)
+            if not frames:
+                print(f"error: no verification frames found in {args.frames_dir}", file=sys.stderr)
+                return 1
+
+        report = verify_frames(
+            frames,
+            min_bytes=args.min_bytes,
+            black_luma_threshold=args.black_luma_threshold,
+            near_identical_rms_threshold=args.near_identical_threshold,
+            contact_sheet_path=args.contact_sheet,
+        )
+        if args.json_out:
+            write_frame_qc_json(report, args.json_out)
+        if args.md_out:
+            write_frame_qc_markdown(report, args.md_out)
+        print(json.dumps(report.to_dict(), indent=2))
+        if args.strict:
+            return 0 if report.overall == "pass" else 1
+        return 1 if report.overall == "fail" else 0
+
+    if args.command == "list-presets":
         if args.json:
             print(json.dumps({name: preset.to_dict() for name, preset in PRESETS.items()}, indent=2))
         else:
@@ -319,17 +394,33 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.command == "probe-media":
-        import json
-
         from .probe import probe_media
 
         probe = probe_media(args.input)
         print(json.dumps(probe.to_dict(), indent=2))
         return 0
 
-    if args.command == "validate-export":
-        import json
+    if args.command == "analyze-audio":
+        from .audio_qc import inspect_audio, write_audio_qc_json, write_audio_qc_markdown
 
+        report = inspect_audio(
+            args.input,
+            expected_sample_rate=args.expected_sample_rate,
+            expected_channels=args.expected_channels,
+            clipping_threshold_db=args.clipping_threshold_db,
+            silence_noise_db=args.silence_noise_db,
+            silence_min_duration=args.silence_min_duration,
+        )
+        if args.json_out:
+            write_audio_qc_json(report, args.json_out)
+        if args.md_out:
+            write_audio_qc_markdown(report, args.md_out)
+        print(json.dumps(report.to_dict(), indent=2))
+        if args.strict:
+            return 0 if report.overall == "pass" else 1
+        return 1 if report.overall == "fail" else 0
+
+    if args.command == "validate-export":
         from .probe import probe_media
         from .validation import validate_export, write_json_report, write_markdown_report
 

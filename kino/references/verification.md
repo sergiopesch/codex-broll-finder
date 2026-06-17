@@ -13,6 +13,29 @@ Extract frames at:
 
 Inspect the resulting frames before presenting the render.
 
+## Contact Sheet And Frame QC
+
+After `verify-frames`, generate a labeled sheet and machine-readable QC report:
+
+```bash
+python3 kino/scripts/kino_tool.py make-contact-sheet verify_frames KINO-CONTACT-SHEET.jpg
+python3 kino/scripts/kino_tool.py check-frames verify_frames \
+  --manifest KINO-MANIFEST.json \
+  --json-out KINO-FRAME-QC.json \
+  --md-out KINO-FRAME-QC.md \
+  --contact-sheet KINO-CONTACT-SHEET.jpg
+```
+
+Treat `fail` as blocking. Treat `warning` as a visible review item; intentional still cutaways can legitimately produce near-identical-frame warnings.
+
+Current automated checks:
+
+- expected verification frame files from the manifest
+- tiny or empty frame files
+- unreadable image files
+- black or near-black frames
+- near-identical adjacent verification frames
+
 ## Auto-Reject
 
 Reject and fix any frame with:

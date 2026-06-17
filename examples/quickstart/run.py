@@ -71,6 +71,11 @@ def run_quickstart(
         "asset": assets_dir / "cutaway.png",
         "render": workdir / "rendered.mp4",
         "render_receipt": workdir / "KINO-RENDER.json",
+        "contact_sheet": workdir / "KINO-CONTACT-SHEET.jpg",
+        "frame_qc_json": workdir / "KINO-FRAME-QC.json",
+        "frame_qc_md": workdir / "KINO-FRAME-QC.md",
+        "audio_qc_json": workdir / "KINO-AUDIO-QC.json",
+        "audio_qc_md": workdir / "KINO-AUDIO-QC.md",
         "export": workdir / f"export.{preset}.mp4",
         "validation_json": workdir / "KINO-VALIDATION.json",
         "validation_md": workdir / "KINO-VALIDATION.md",
@@ -84,6 +89,7 @@ def run_quickstart(
     _write_transcript(paths["transcript"])
 
     env = _cli_env(repo_root)
+    _require_python_modules(python, env, "PIL")
     _run_cli(python, ["init-edit", "transcript.json", "KINO-EDIT.json", "--id", "quickstart-edit"], workdir, env)
     _run_cli(
         python,
@@ -192,6 +198,38 @@ def run_quickstart(
     )
     _run_cli(python, ["render-cutaways", "KINO-MANIFEST.json"], workdir, env)
     _run_cli(python, ["verify-frames", "KINO-MANIFEST.json", "--out-dir", "verify_frames"], workdir, env)
+    _run_cli(python, ["make-contact-sheet", "verify_frames", "KINO-CONTACT-SHEET.jpg"], workdir, env)
+    _run_cli(
+        python,
+        [
+            "check-frames",
+            "verify_frames",
+            "--manifest",
+            "KINO-MANIFEST.json",
+            "--json-out",
+            "KINO-FRAME-QC.json",
+            "--md-out",
+            "KINO-FRAME-QC.md",
+            "--contact-sheet",
+            "KINO-CONTACT-SHEET.jpg",
+        ],
+        workdir,
+        env,
+    )
+    _run_cli(
+        python,
+        [
+            "analyze-audio",
+            "rendered.mp4",
+            "--json-out",
+            "KINO-AUDIO-QC.json",
+            "--md-out",
+            "KINO-AUDIO-QC.md",
+            "--strict",
+        ],
+        workdir,
+        env,
+    )
     _run_cli(
         python,
         ["export-variant", "rendered.mp4", paths["export"].name, "--preset", preset, "--crf", "28"],
@@ -305,6 +343,24 @@ def _require_tools(*tools: str) -> None:
     missing = [tool for tool in tools if shutil.which(tool) is None]
     if missing:
         raise QuickstartError(f"missing required tool(s): {', '.join(missing)}")
+
+
+def _require_python_modules(python: str, env: dict[str, str], *modules: str) -> None:
+    missing: list[str] = []
+    for module in modules:
+        result = subprocess.run(
+            [python, "-c", f"import {module}"],
+            env=env,
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode:
+            missing.append(module)
+    if missing:
+        raise QuickstartError(
+            f"missing required Python module(s) for {python}: {', '.join(missing)}. "
+            'Run pip install -e ".[dev]" or pass --python pointing at an environment with Kino dependencies.'
+        )
 
 
 if __name__ == "__main__":

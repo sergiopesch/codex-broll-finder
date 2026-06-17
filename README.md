@@ -30,7 +30,7 @@ Run the reproducible sample edit:
 python3 examples/quickstart/run.py
 ```
 
-The quickstart generates tiny media with `ffmpeg`, writes all artifacts under `examples/quickstart/out/`, and exercises the current loop: `init-edit` -> `add-source`/`add-asset` -> `propose-beat` -> `approve-beat` -> `compile-manifest` -> `render-cutaways` -> `verify-frames` -> `export-variant` -> `validate-export`.
+The quickstart generates tiny media with `ffmpeg`, writes all artifacts under `examples/quickstart/out/`, and exercises the current loop: `init-edit` -> `add-source`/`add-asset` -> `propose-beat` -> `approve-beat` -> `compile-manifest` -> `render-cutaways` -> `verify-frames` -> `make-contact-sheet` -> `check-frames` -> `analyze-audio` -> `export-variant` -> `validate-export`.
 
 External tools used by real video workflows:
 
@@ -48,6 +48,7 @@ This is the starter scaffold. The first usable slice is the manifest-driven cuta
 3. validate with `validate-manifest`
 4. render with `render-cutaways`
 5. extract inspection frames with `verify-frames`
+6. generate a contact sheet and frame/audio QC reports
 
 The first quality-harness commands are also available:
 
@@ -55,6 +56,9 @@ The first quality-harness commands are also available:
 kino --help
 kino list-presets
 kino probe-media output.mp4
+kino make-contact-sheet verify_frames KINO-CONTACT-SHEET.jpg
+kino check-frames verify_frames --manifest KINO-MANIFEST.json --json-out KINO-FRAME-QC.json --md-out KINO-FRAME-QC.md
+kino analyze-audio output.mp4 --json-out KINO-AUDIO-QC.json --md-out KINO-AUDIO-QC.md
 kino validate-export output.mp4 --preset vertical-social --json-out KINO-VALIDATION.json --md-out KINO-VALIDATION.md
 kino validate-export output.mp4 --preset vertical-social --strict
 kino export-variant output.mp4 output.vertical.mp4 --preset vertical-social
@@ -67,7 +71,7 @@ Kino is moving in stages from a cutaway manifest to a graph-backed edit engine:
 - `KINO-MANIFEST.json` remains the supported Phase 1 execution input.
 - `KINO-EDIT.json` is the planning state initialized by `init-edit` for transcript tokens, source receipts, asset candidates, beat candidates, approvals, and rejections.
 - The second build target is a transcript-to-manifest planning loop: initialize an edit, propose beats from transcript ranges, approve or reject each candidate, then run `compile-manifest` to write the approved beats into `KINO-MANIFEST.json`.
-- Rendering still goes through `KINO-MANIFEST.json`: validate with `validate-manifest`, render with `render-cutaways`, and inspect with `verify-frames`.
+- Rendering still goes through `KINO-MANIFEST.json`: validate with `validate-manifest`, render with `render-cutaways`, inspect with `verify-frames`, and write QC artifacts with `make-contact-sheet`, `check-frames`, and `analyze-audio`.
 - The render graph is a typed intermediate representation for sources, tracks, clips, outputs, validation expectations, canonical JSON, and stable hashes.
 - Cutaway renders now write `KINO-RENDER.json` with manifest hash, render graph hash, ffmpeg command hash, tool versions, paths, and formatted-asset commands.
 - Source receipts are represented in `KINO-EDIT.json`; automated source-receipt writing and graph execution are still future work.
