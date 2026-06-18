@@ -1,0 +1,77 @@
+{
+  "id": "youtube-Con4KzJsSmg",
+  "duration": 80.434,
+  "platforms": ["YouTube", "Landing Page", "Product Hunt"],
+  "aspect_ratio": "16:9",
+  "pacing": "medium",
+  "primary_spine": "founder-led explanation",
+  "visual_signals": [
+    "founder talking head",
+    "screen recording",
+    "product UI walkthrough",
+    "hardware proof shot",
+    "clean CTA"
+  ],
+  "proof_signals": ["working hardware result", "product UI code generation", "wiring diagram", "deploy button"],
+  "cta": "Available and free at schematic.io.",
+  "notes": [
+    "Reference only; no downloaded media, subtitles, or frames are committed.",
+    "Observed major scene changes: 0.5, 0.9, 5.2, 6.4, 9.1, 11.6, 14.6, 21.2, 32.4, 35.2, 36.8, 40.2, 42.1, 43.5, 45.8, 49.8, 56.3, 58.4, 61.3, 63.6, 65.7, 67.1, 69.3, 72.1, 74.8, 75.7 seconds."
+  ],
+  "transcript_cues": [
+    {
+      "id": "cue.cold-open",
+      "token_start": 0,
+      "token_end": 14,
+      "text": "The craziest thing just happened. I built the cursor for hardware and it is working.",
+      "kind": "hook",
+      "confidence": 0.94,
+      "note": "Cold open with surprising result."
+    },
+    {
+      "id": "cue.problem",
+      "token_start": 14,
+      "token_end": 52,
+      "text": "I bought hardware wanting to make cool projects, but I have zero skills.",
+      "kind": "problem",
+      "confidence": 0.93,
+      "note": "Origin story and user problem."
+    },
+    {
+      "id": "cue.positioning",
+      "token_start": 52,
+      "token_end": 82,
+      "text": "Schematic is basically the cursor for hardware. It generates code and the schema.",
+      "kind": "claim",
+      "confidence": 0.91,
+      "note": "Product positioning."
+    },
+    {
+      "id": "cue.walkthrough",
+      "token_start": 82,
+      "token_end": 128,
+      "text": "Ask Schematic to connect an ESP32 board to a display and show some text.",
+      "kind": "demo",
+      "confidence": 0.9,
+      "note": "Live product walkthrough."
+    },
+    {
+      "id": "cue.proof",
+      "token_start": 128,
+      "token_end": 166,
+      "text": "It shows code, a wiring diagram, components, instructions, and deploys to the device.",
+      "kind": "proof",
+      "confidence": 0.9,
+      "note": "Product proof and physical validation."
+    },
+    {
+      "id": "cue.cta",
+      "token_start": 166,
+      "token_end": 188,
+      "text": "If you want to give this a go, it is available and free.",
+      "kind": "cta",
+      "confidence": 0.88,
+      "note": "Clean CTA."
+    }
+  ]
+}

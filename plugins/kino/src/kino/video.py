@@ -4,6 +4,7 @@ import subprocess
 from pathlib import Path
 
 from .manifest import Beat, Manifest
+from .receipt import beat_asset_timing_hash, build_render_receipt, write_render_receipt
 
 
 class ToolError(RuntimeError):
@@ -146,20 +147,38 @@ def build_render_command(manifest: Manifest, formatted: list[Path], end: float) 
     ]
 
 
+def formatted_clip_path(beat: Beat, fmt_dir: Path, vf: str) -> Path:
+    return fmt_dir / f"{beat.id}-{beat_asset_timing_hash(beat, vf)}.mp4"
+
+
 def render_cutaways(manifest: Manifest, fmt_dir: Path | None = None) -> Path:
     fmt_dir = fmt_dir or manifest.path.parent / "assets" / "fmt"
     fmt_dir.mkdir(parents=True, exist_ok=True)
     vf = video_filter(*manifest.size, manifest.fps)
 
     formatted: list[Path] = []
+    formatted_commands: list[list[str]] = []
     for beat in manifest.beats:
-        out = fmt_dir / f"{beat.id}.mp4"
+        out = formatted_clip_path(beat, fmt_dir, vf)
         formatted.append(out)
         if not out.exists():
-            run(format_clip_args(beat, out, vf))
+            command = format_clip_args(beat, out, vf)
+            formatted_commands.append(command)
+            run(command)
 
     end = ffprobe_duration(manifest.base)
-    run(build_render_command(manifest, formatted, end))
+    command = build_render_command(manifest, formatted, end)
+    run(command)
+    write_render_receipt(
+        build_render_receipt(
+            manifest,
+            command,
+            formatted,
+            base_duration=end,
+            formatted_commands=formatted_commands,
+        ),
+        manifest.path.parent,
+    )
     return manifest.output
 
 

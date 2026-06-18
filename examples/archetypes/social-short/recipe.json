@@ -1,0 +1,202 @@
+{
+  "recipe_schema_version": 1,
+  "id": "social-short.reference-recipe",
+  "archetype": {
+    "id": "social-short",
+    "name": "Social Short",
+    "editorial_goal": "Compress a vertical founder or voiceover clip into a fast proof-led short with a hook, claim, visual proof, and CTA."
+  },
+  "reference": {
+    "url": "https://youtube.com/shorts/jsBikM65h5w",
+    "platform": "YouTube Shorts",
+    "media_policy": "Reference only. Do not commit downloaded video, audio, frames, subtitles, or screenshots.",
+    "notes": "Timing and cue text are lightweight observations for planning fixtures, not a complete transcript."
+  },
+  "target": {
+    "duration_seconds": {
+      "min": 15,
+      "max": 60,
+      "fixture": 28
+    },
+    "aspect_ratio": "9:16",
+    "master_size": [1080, 1920],
+    "fps": 30,
+    "platform_variants": ["youtube-shorts", "tiktok", "instagram-reels", "linkedin-vertical"],
+    "pacing": "hard cuts with new visual proof every 2-4 seconds"
+  },
+  "observed_scene_timing": [
+    {
+      "id": "obs.hook",
+      "start": 0.0,
+      "end": 2.0,
+      "section": "hook",
+      "primary_visual": "talking head with oversized emphasis captions",
+      "purpose": "create immediate tension and make the viewer understand the stakes"
+    },
+    {
+      "id": "obs.problem",
+      "start": 2.0,
+      "end": 9.0,
+      "section": "problem",
+      "primary_visual": "talking head interrupted by quick proof inserts",
+      "purpose": "state the pain or confession without dead air"
+    },
+    {
+      "id": "obs.fix",
+      "start": 9.0,
+      "end": 14.0,
+      "section": "fix",
+      "primary_visual": "product or workflow insert tied to the spoken claim",
+      "purpose": "name the upgrade or mechanism"
+    },
+    {
+      "id": "obs.proof",
+      "start": 14.0,
+      "end": 19.0,
+      "section": "proof",
+      "primary_visual": "fast demo, screen, object, or result montage",
+      "purpose": "turn the spoken claim into visible evidence"
+    },
+    {
+      "id": "obs.cta",
+      "start": 19.0,
+      "end": 28.0,
+      "section": "cta",
+      "primary_visual": "site or product CTA montage",
+      "purpose": "convert attention into the next action"
+    }
+  ],
+  "structure_sections": [
+    {
+      "id": "hook",
+      "label": "Provocative Hook",
+      "target_range_seconds": [0.0, 2.0],
+      "intent": "Open on a direct tension statement.",
+      "visual_strategy": "Keep face or voice spine dominant; add 1-4 word burned-in emphasis.",
+      "planning_primitives": ["hook_detector", "semantic_emphasis_caption_planner"]
+    },
+    {
+      "id": "problem",
+      "label": "Problem Or Confession",
+      "target_range_seconds": [2.0, 9.0],
+      "intent": "Make the problem concrete and relatable.",
+      "visual_strategy": "Remove filler and add quick inserts for specific nouns or claims.",
+      "planning_primitives": ["speech_compression", "proof_insert_planner"]
+    },
+    {
+      "id": "fix",
+      "label": "Fix Or Upgrade Claim",
+      "target_range_seconds": [9.0, 14.0],
+      "intent": "State the mechanism that changes the outcome.",
+      "visual_strategy": "Show product UI, system state, or workflow evidence when the claim is spoken.",
+      "planning_primitives": ["claim_detector", "vertical_ui_formatter"]
+    },
+    {
+      "id": "proof",
+      "label": "Proof Or Demo",
+      "target_range_seconds": [14.0, 19.0],
+      "intent": "Prove the mechanism with an observable result.",
+      "visual_strategy": "Use screen capture, object footage, result stills, or contact-sheet proof.",
+      "planning_primitives": ["proof_shot_selector", "caption_frame_qc"]
+    },
+    {
+      "id": "cta",
+      "label": "CTA Or Proof Montage",
+      "target_range_seconds": [19.0, 28.0],
+      "intent": "Show where to go next and leave a final proof impression.",
+      "visual_strategy": "Use site/product montage with clear readable scale and a clean final frame.",
+      "planning_primitives": ["cta_montage_generator", "frame_audio_caption_qc"]
+    }
+  ],
+  "transcript_cue_snippets": [
+    {
+      "id": "cue.hook",
+      "time_range": [0.0, 1.86],
+      "snippet": "Stop shipping demo videos without proof.",
+      "section": "hook",
+      "caption_emphasis": ["Stop", "without proof"],
+      "proof_requirement": "No proof insert required yet; prioritize retention caption."
+    },
+    {
+      "id": "cue.problem",
+      "time_range": [2.2, 7.7],
+      "snippet": "Most edits explain the feature, but the viewer never sees the result.",
+      "section": "problem",
+      "caption_emphasis": ["never sees", "result"],
+      "proof_requirement": "Show a before/after or missing-proof visual."
+    },
+    {
+      "id": "cue.fix",
+      "time_range": [9.0, 13.9],
+      "snippet": "A new agent should match each claim to the exact visual evidence.",
+      "section": "fix",
+      "caption_emphasis": ["each claim", "visual evidence"],
+      "proof_requirement": "Insert product planning UI or proof map."
+    },
+    {
+      "id": "cue.proof",
+      "time_range": [14.5, 18.8],
+      "snippet": "When I say website, it cuts to the site and checks the frame.",
+      "section": "proof",
+      "caption_emphasis": ["website", "checks the frame"],
+      "proof_requirement": "Show vertical website capture and verification frame."
+    },
+    {
+      "id": "cue.cta",
+      "time_range": [20.0, 27.8],
+      "snippet": "Use the recipe, review the proof map, then render the short.",
+      "section": "cta",
+      "caption_emphasis": ["review", "render"],
+      "proof_requirement": "Show CTA montage: recipe, proof map, final render."
+    }
+  ],
+  "replica_plan": {
+    "inputs": [
+      {
+        "id": "input.primary-spine",
+        "kind": "video",
+        "required": true,
+        "description": "User-owned vertical talking-head or voiceover clip with word-aligned transcript."
+      },
+      {
+        "id": "input.product-ui",
+        "kind": "capture",
+        "required": true,
+        "description": "User-owned product UI or website capture for concrete claims."
+      },
+      {
+        "id": "input.proof-assets",
+        "kind": "video_or_still",
+        "required": false,
+        "description": "Result shots, object footage, contact sheets, or screenshots that prove spoken claims."
+      }
+    ],
+    "planner_outputs": [
+      "KINO-EDIT.json with approved proof/caption beats",
+      "KINO-MANIFEST.json compiled from approved beats",
+      "KINO-RENDER.json render receipt",
+      "caption frame plan with 1-4 emphasized words per caption",
+      "proof map linking claims to source receipts and assets",
+      "frame/audio/caption QC reports"
+    ],
+    "expected_core_flow": [
+      "load KINO-EDIT.json",
+      "validate transcript, source receipts, asset candidates, and beat candidates",
+      "compile approved beats into KINO-MANIFEST.json",
+      "render with caller-provided media that resolves placeholder URIs"
+    ]
+  },
+  "core_consumable_fixtures": [
+    {
+      "path": "KINO-EDIT.json",
+      "format": "KINO-EDIT v2",
+      "consumer": "kino.edit.KinoEdit.from_json and kino.compile.compile_edit_to_manifest"
+    }
+  ],
+  "quality_gates": [
+    "No committed binary media or downloaded reference assets.",
+    "Every concrete claim has a proof route or explicit caption-only fallback.",
+    "Caption snippets remain readable in 9:16 safe areas.",
+    "Approved beat token ranges are sorted and non-overlapping after manifest compilation."
+  ]
+}

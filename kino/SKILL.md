@@ -19,22 +19,43 @@ The agent narrows the funnel; the user makes taste calls. For objective routes, 
 4. **Source by origin**: after approval, group beats by source so one website capture or official video can cover several beats.
 5. **Format assets**: output silent, full-bleed clips. Use the bundled tool for still zooms, page captures, validation, and cutaway renders.
 6. **Maintain state**: keep a `KINO-MANIFEST.json` for machine execution and a short `KINO-MANIFEST.md` for human review. Approved beats must not disappear between renders.
-7. **Verify visually**: extract midpoint and joint frames after each render, inspect them, and fix rejected frames before presenting the result.
-8. **Export and validate**: create requested platform variants, run `validate-export`, and include `KINO-VALIDATION.json` plus `KINO-VALIDATION.md` with the handoff.
+7. **Verify visually**: extract midpoint and joint frames after each render, generate a contact sheet, run frame QC, inspect the result, and fix rejected frames before presenting the render.
+8. **Check audio**: run audio QC on the rendered master or final export before handoff.
+9. **Export and validate**: create requested platform variants, run `validate-export`, and include `KINO-VALIDATION.json` plus `KINO-VALIDATION.md` with the handoff.
+10. **Review media directly**: run `review-media` on the rendered/exported file to sample frames, check audio, validate the preset, and inspect caption/archetype contracts into `KINO-REVIEW.json`.
+11. **Evaluate handoff**: run `eval` over available plan, caption, media review, frame QC, audio QC, and export validation artifacts to write `KINO-EVAL.json` and `KINO-EVAL.md`.
 
 ## Planning Contract
+
+When a workflow needs an explicit review artifact, write `KINO-PLAN.json` before sourcing media or mutating `KINO-EDIT.json`. Treat it as the proposed plan for human or agent approval, not as executable render state or a user-facing timeline.
 
 Each proposed beat must include:
 
 - `id`: stable short id, such as `b001`
-- `time`: transcript or word-timestamp anchor
-- `line`: the narration being illustrated
+- `anchor`: transcript token range, word ids, and quote being illustrated
 - `interpretation`: what the line is actually about
 - `route`: `receipt`, `entity`, `product-ui`, `concept`, `evocative`, or `taste`
 - `source_plan`: where the correct asset should come from
 - `fallback`: what to try if the preferred source fails
+- `reasons` and `confidence`: why Kino proposed the beat and how strong the match is
+
+Use `plan-edit` to generate `KINO-PLAN.json`, `validate-plan` to gate it, and `apply-plan` to import it into `KINO-EDIT.json` as proposed beats. Once the plan is approved, renderable output still compiles through `KINO-MANIFEST.json`.
 
 Before sourcing, check the palette. If more than 60% of planned beats are website screenshots, revise the plan unless the script is explicitly receipt-heavy.
+
+For shorts, reels, and explainer clips, plan captions as part of the edit language. Use `plan-captions` to create `KINO-CAPTIONS.json`, `validate-captions` to check readability and transcript anchors, and `render-captions` to burn captions into the video after the underlying cut is ready.
+
+After planning, rendering, QC, and export validation, run `review-media` on the actual output, then run `eval` to write `KINO-EVAL.json` and `KINO-EVAL.md`. Treat review/eval as the iteration scorecard: fix `fail`, review `warning` and `manual-review-required`, then rerun to confirm improvement.
+
+## Examples
+
+Use `examples/quickstart/run.py` when you need to verify the current local render/export/QC loop. It generates tiny media, creates `KINO-EDIT.json`, preserves one approved and one rejected beat, compiles only approved beats to `KINO-MANIFEST.json`, renders cutaways, extracts verification frames, writes frame/audio QC reports, exports a variant, validates the export, reviews the exported media, and evaluates the handoff.
+
+Use `examples/archetypes/run.py` when you need repo-safe social-short or founder-product-explainer skeletons. It adapts the archetype fixtures into synthetic `KINO-EDIT.json` and `KINO-MANIFEST.json` outputs without downloading reference media. Treat `plan-replica` output as intent-level planning guidance, not as a complete source-acquisition or graph-execution pipeline.
+
+Use `review-media` after a rendered or exported media file exists. Use `eval` after planning or QC artifacts exist. For quickstart outputs, evaluate `KINO-REVIEW.json`, `KINO-FRAME-QC.json`, `KINO-AUDIO-QC.json`, and `KINO-VALIDATION.json`. For planning workflows, include `KINO-PLAN.json` and `KINO-CAPTIONS.json` when present.
+
+If a documented helper is not present in `kino --help`, mark it as a docs recommendation or future command instead of assuming runtime support.
 
 ## References
 
@@ -56,13 +77,24 @@ python3 kino/scripts/kino_tool.py --help
 
 Primary commands:
 
+- `plan-edit`, `validate-plan`, and `apply-plan`: create, validate, and import `KINO-PLAN.json` proposed beats.
+- `plan-captions`, `validate-captions`, and `render-captions`: create, validate, and burn in `KINO-CAPTIONS.json`.
+- `review-media`: inspect an actual media file and write `KINO-REVIEW.json` plus optional Markdown/contact-sheet artifacts.
+- `eval`: aggregate plan, caption, media review, frame, audio, and export reports into `KINO-EVAL.json`.
+- `init-edit`: create `KINO-EDIT.json` from transcript JSON.
+- `propose-beat`, `approve-beat`, `reject-beat`, and `compile-manifest`: maintain planning state and compile approved beats to `KINO-MANIFEST.json`.
 - `validate-manifest`: parse and check `KINO-MANIFEST.json`.
 - `zoom-still`: render a smooth sub-pixel still zoom without ffmpeg `zoompan`.
 - `capture-page`: capture a public page or tweet embed with headless Chrome/Chromium.
 - `render-cutaways`: replace base-video visuals during beat windows while preserving base audio.
 - `verify-frames`: extract beat midpoint and transition frames for inspection.
+- `make-contact-sheet`: build a labeled visual grid from extracted verification frames.
+- `check-frames`: write JSON/Markdown frame QC reports for missing, tiny, black, or frozen-looking frames.
 - `list-presets`: list built-in social export presets.
+- `list-archetypes`: list built-in intent-level video archetypes such as social shorts and founder product explainers.
+- `plan-replica`: compile reference-analysis JSON into an intent-level replica beat plan.
 - `probe-media`: inspect output streams with `ffprobe`.
+- `analyze-audio`: write JSON/Markdown audio QC reports for stream metadata, clipping risk, and silence gaps.
 - `validate-export`: validate output against a social export preset and write JSON/Markdown reports.
 - `export-variant`: render a platform-specific variant from a finished edit.
 
