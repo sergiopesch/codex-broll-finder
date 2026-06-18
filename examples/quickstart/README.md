@@ -21,13 +21,18 @@ The run writes all generated files to `examples/quickstart/out` by default:
 - `export.landscape-web.mp4`
 - `KINO-VALIDATION.json`
 - `KINO-VALIDATION.md`
+- `review_frames/`
+- `KINO-REVIEW-SHEET.jpg`
+- `KINO-REVIEW.json`
+- `KINO-REVIEW.md`
 - `KINO-EVAL.json`
 - `KINO-EVAL.md`
 
-The final runner step aggregates generated QC artifacts with:
+The final runner steps review the exported media and aggregate generated QC artifacts with:
 
 ```bash
-kino eval --frame-qc KINO-FRAME-QC.json --audio-qc KINO-AUDIO-QC.json --validation KINO-VALIDATION.json --out KINO-EVAL.json --md-out KINO-EVAL.md
+kino review-media export.landscape-web.mp4 --preset landscape-web --frames-dir review_frames --contact-sheet KINO-REVIEW-SHEET.jpg --out KINO-REVIEW.json --md-out KINO-REVIEW.md
+kino eval --review KINO-REVIEW.json --frame-qc KINO-FRAME-QC.json --audio-qc KINO-AUDIO-QC.json --validation KINO-VALIDATION.json --out KINO-EVAL.json --md-out KINO-EVAL.md
 ```
 
 Use a temporary output directory when you want a clean run:
@@ -56,9 +61,10 @@ check-frames
 analyze-audio
 export-variant
 validate-export
+review-media
 eval
 ```
 
-After rendering, the runner extracts verification frames, generates a labeled contact sheet, writes frame QC reports, analyzes audio on the rendered master, exports a platform variant, validates that export against the selected preset, and writes a final `KINO-EVAL` scorecard.
+After rendering, the runner extracts verification frames, generates a labeled contact sheet, writes frame QC reports, analyzes audio on the rendered master, exports a platform variant, validates that export against the selected preset, runs a direct media review over the exported file, and writes a final `KINO-EVAL` scorecard.
 
-This example does not test live sourcing, transcription, `KINO-PLAN.json`, caption rendering, or graph execution. Those are separate contracts: archetype planning lives under `examples/archetypes/`, KINO-EVAL aggregation runs over generated QC artifacts, and rendering still starts from `KINO-MANIFEST.json`.
+This example does not test live sourcing, transcription, `KINO-PLAN.json`, caption rendering, or graph execution. Those are separate contracts: archetype planning lives under `examples/archetypes/`, KINO-REVIEW inspects the generated media artifact, KINO-EVAL aggregation runs over generated QC artifacts, and rendering still starts from `KINO-MANIFEST.json`.

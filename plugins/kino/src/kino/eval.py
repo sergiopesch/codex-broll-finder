@@ -169,6 +169,7 @@ def evaluate_artifacts(
     eval_id: str = "kino-eval",
     plan_path: str | Path | None = None,
     captions_path: str | Path | None = None,
+    review_path: str | Path | None = None,
     frame_qc_path: str | Path | None = None,
     audio_qc_path: str | Path | None = None,
     export_validation_path: str | Path | None = None,
@@ -191,6 +192,7 @@ def evaluate_artifacts(
         artifacts.append(_artifact("captions", path, caption_checks, f"{len(captions.segments)} caption segment(s)"))
 
     for kind, path_like in (
+        ("media-review", review_path),
         ("frame-qc", frame_qc_path),
         ("audio-qc", audio_qc_path),
         ("export-validation", export_validation_path),
@@ -472,6 +474,8 @@ def _status_recommendation(kind: str, overall: EvalStatus) -> str | None:
         return "Inspect verification frames/contact sheet and rerender rejected frames."
     if kind == "audio-qc":
         return "Normalize audio or fix clipping/silence before export."
+    if kind == "media-review":
+        return "Fix direct media review issues before handoff."
     if kind == "export-validation":
         return "Re-export with the target preset and rerun validate-export."
     return f"Resolve {kind} report warnings before delivery."

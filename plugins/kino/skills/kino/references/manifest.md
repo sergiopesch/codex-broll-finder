@@ -8,6 +8,8 @@ Use `KINO-MANIFEST.json` as the current executable source of truth for Phase 1 c
 
 `KINO-CAPTIONS.json` is the transcript-derived caption artifact. It stores word-aligned caption segments, style presets, emphasized words, reasons, and confidence before ffmpeg burns captions into a rendered video.
 
+`KINO-REVIEW.json` is the media-aware review artifact. It inspects the actual rendered/exported file, samples frames, checks audio, validates export settings, and records caption/archetype contract issues before final evaluation.
+
 `KINO-EVAL.json` is the build/test/refine scorecard. It aggregates specialized reports into a normalized status, score, decision, and next-action list.
 
 ## Current Cutaway Manifest
@@ -209,9 +211,50 @@ The CLI contract is:
 2. `validate-captions KINO-CAPTIONS.json --edit KINO-EDIT.json` checks readability, token anchors, transcript hash parity, and confidence bounds.
 3. `render-captions input.mp4 KINO-CAPTIONS.json output.captioned.mp4` writes an ASS sidecar and burns captions into the video.
 
+## KINO-REVIEW Shape
+
+`KINO-REVIEW.json` should be generated from the actual rendered or exported media file:
+
+```json
+{
+  "version": 1,
+  "schema": "kino.review.v1",
+  "id": "kino-review",
+  "media": "output.vertical.mp4",
+  "preset": "vertical-social",
+  "archetype_id": "social-short",
+  "overall": "warning",
+  "recommendations": ["Run plan-captions and render-captions before final review."],
+  "artifacts": [
+    {
+      "kind": "frame-qc",
+      "path": "review_frames",
+      "summary": "3 sampled review frame(s)"
+    }
+  ],
+  "checks": [
+    {
+      "name": "social_short_captions",
+      "category": "archetype",
+      "status": "warning",
+      "expected": "caption artifact",
+      "observed": "missing",
+      "message": "Short-form videos usually need burned-in captions for silent autoplay.",
+      "recommendation": "Run plan-captions and render-captions before final review."
+    }
+  ]
+}
+```
+
+The CLI contract is:
+
+1. `review-media output.vertical.mp4 --preset vertical-social --archetype social-short --captions KINO-CAPTIONS.json --frames-dir review_frames --contact-sheet KINO-REVIEW-SHEET.jpg --out KINO-REVIEW.json --md-out KINO-REVIEW.md`
+2. Default exit behavior matches other Kino QC commands: nonzero only on `fail`.
+3. `--strict` exits nonzero unless the direct review passes cleanly.
+
 ## KINO-EVAL Shape
 
-`KINO-EVAL.json` should be generated after the available planning, caption, frame, audio, and export checks:
+`KINO-EVAL.json` should be generated after the available planning, caption, direct media review, frame, audio, and export checks:
 
 ```json
 {
@@ -247,7 +290,7 @@ The CLI contract is:
 
 The CLI contract is:
 
-1. `eval --plan KINO-PLAN.json --captions KINO-CAPTIONS.json --frame-qc KINO-FRAME-QC.json --audio-qc KINO-AUDIO-QC.json --validation KINO-VALIDATION.json --out KINO-EVAL.json --md-out KINO-EVAL.md`
+1. `eval --plan KINO-PLAN.json --captions KINO-CAPTIONS.json --review KINO-REVIEW.json --frame-qc KINO-FRAME-QC.json --audio-qc KINO-AUDIO-QC.json --validation KINO-VALIDATION.json --out KINO-EVAL.json --md-out KINO-EVAL.md`
 2. Default exit behavior matches other Kino QC commands: nonzero only on `fail`.
 3. `--strict` exits nonzero unless the evaluation passes cleanly.
 

@@ -167,6 +167,21 @@ def main(argv: list[str] | None = None) -> int:
     render_captions.add_argument("--ass-out", help="Write/use this ASS subtitle sidecar path")
     render_captions.add_argument("--size", default="1080x1920")
 
+    review = sub.add_parser("review-media", help="Run direct media, frame, audio, export, and caption review")
+    review.add_argument("input")
+    review.add_argument("--id", default="kino-review", dest="review_id")
+    review.add_argument("--preset", choices=sorted(PRESETS))
+    review.add_argument("--archetype", choices=["social-short", "founder-product-explainer"])
+    review.add_argument("--captions")
+    review.add_argument("--frames-dir")
+    review.add_argument("--contact-sheet")
+    review.add_argument("--sample-count", type=int, default=3)
+    review.add_argument("--expected-sample-rate", type=int, default=48000)
+    review.add_argument("--expected-channels", type=int)
+    review.add_argument("--json-out", "--out", dest="json_out")
+    review.add_argument("--md-out")
+    review.add_argument("--strict", action="store_true", help="Return nonzero unless review passes")
+
     evaluate = sub.add_parser(
         "eval",
         aliases=["evaluate"],
@@ -175,6 +190,7 @@ def main(argv: list[str] | None = None) -> int:
     evaluate.add_argument("--id", default="kino-eval", dest="eval_id")
     evaluate.add_argument("--plan")
     evaluate.add_argument("--captions")
+    evaluate.add_argument("--review")
     evaluate.add_argument("--frame-qc")
     evaluate.add_argument("--audio-qc")
     evaluate.add_argument("--export-validation", "--validation", dest="export_validation")
@@ -538,6 +554,7 @@ def main(argv: list[str] | None = None) -> int:
             eval_id=args.eval_id,
             plan_path=args.plan,
             captions_path=args.captions,
+            review_path=args.review,
             frame_qc_path=args.frame_qc,
             audio_qc_path=args.audio_qc,
             export_validation_path=args.export_validation,
@@ -546,6 +563,30 @@ def main(argv: list[str] | None = None) -> int:
             write_eval_json(report, args.json_out)
         if args.md_out:
             write_eval_markdown(report, args.md_out)
+        print(json.dumps(report.to_dict(), indent=2))
+        if args.strict:
+            return 0 if report.overall == "pass" else 1
+        return 1 if report.overall == "fail" else 0
+
+    if args.command == "review-media":
+        from .review import review_media, write_review_json, write_review_markdown
+
+        report = review_media(
+            args.input,
+            review_id=args.review_id,
+            preset=args.preset,
+            archetype_id=args.archetype,
+            captions_path=args.captions,
+            frames_dir=args.frames_dir,
+            contact_sheet_path=args.contact_sheet,
+            sample_count=args.sample_count,
+            expected_sample_rate=args.expected_sample_rate,
+            expected_channels=args.expected_channels,
+        )
+        if args.json_out:
+            write_review_json(report, args.json_out)
+        if args.md_out:
+            write_review_markdown(report, args.md_out)
         print(json.dumps(report.to_dict(), indent=2))
         if args.strict:
             return 0 if report.overall == "pass" else 1

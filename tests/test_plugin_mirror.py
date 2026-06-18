@@ -8,6 +8,7 @@ def test_plugin_mirrors_kino_planner_runtime_files():
     for relative in (
         "src/kino/captions.py",
         "src/kino/eval.py",
+        "src/kino/review.py",
         "src/kino/plan.py",
         "src/kino/edit.py",
         "src/kino/cli.py",

@@ -22,7 +22,8 @@ The agent narrows the funnel; the user makes taste calls. For objective routes, 
 7. **Verify visually**: extract midpoint and joint frames after each render, generate a contact sheet, run frame QC, inspect the result, and fix rejected frames before presenting the render.
 8. **Check audio**: run audio QC on the rendered master or final export before handoff.
 9. **Export and validate**: create requested platform variants, run `validate-export`, and include `KINO-VALIDATION.json` plus `KINO-VALIDATION.md` with the handoff.
-10. **Evaluate handoff**: run `eval` over available plan, caption, frame QC, audio QC, and export validation artifacts to write `KINO-EVAL.json` and `KINO-EVAL.md`.
+10. **Review media directly**: run `review-media` on the rendered/exported file to sample frames, check audio, validate the preset, and inspect caption/archetype contracts into `KINO-REVIEW.json`.
+11. **Evaluate handoff**: run `eval` over available plan, caption, media review, frame QC, audio QC, and export validation artifacts to write `KINO-EVAL.json` and `KINO-EVAL.md`.
 
 ## Planning Contract
 
@@ -44,15 +45,15 @@ Before sourcing, check the palette. If more than 60% of planned beats are websit
 
 For shorts, reels, and explainer clips, plan captions as part of the edit language. Use `plan-captions` to create `KINO-CAPTIONS.json`, `validate-captions` to check readability and transcript anchors, and `render-captions` to burn captions into the video after the underlying cut is ready.
 
-After planning, rendering, QC, and export validation, run `eval` to write `KINO-EVAL.json` and `KINO-EVAL.md`. Treat it as the iteration scorecard: fix `fail`, review `warning` and `manual-review-required`, then rerun eval to confirm improvement.
+After planning, rendering, QC, and export validation, run `review-media` on the actual output, then run `eval` to write `KINO-EVAL.json` and `KINO-EVAL.md`. Treat review/eval as the iteration scorecard: fix `fail`, review `warning` and `manual-review-required`, then rerun to confirm improvement.
 
 ## Examples
 
-Use `examples/quickstart/run.py` when you need to verify the current local render/export/QC loop. It generates tiny media, creates `KINO-EDIT.json`, preserves one approved and one rejected beat, compiles only approved beats to `KINO-MANIFEST.json`, renders cutaways, extracts verification frames, writes frame/audio QC reports, exports a variant, and validates the export.
+Use `examples/quickstart/run.py` when you need to verify the current local render/export/QC loop. It generates tiny media, creates `KINO-EDIT.json`, preserves one approved and one rejected beat, compiles only approved beats to `KINO-MANIFEST.json`, renders cutaways, extracts verification frames, writes frame/audio QC reports, exports a variant, validates the export, reviews the exported media, and evaluates the handoff.
 
 Use `examples/archetypes/run.py` when you need repo-safe social-short or founder-product-explainer skeletons. It adapts the archetype fixtures into synthetic `KINO-EDIT.json` and `KINO-MANIFEST.json` outputs without downloading reference media. Treat `plan-replica` output as intent-level planning guidance, not as a complete source-acquisition or graph-execution pipeline.
 
-Use `eval` after planning or QC artifacts exist. For quickstart outputs, evaluate `KINO-FRAME-QC.json`, `KINO-AUDIO-QC.json`, and `KINO-VALIDATION.json`. For planning workflows, include `KINO-PLAN.json` and `KINO-CAPTIONS.json` when present.
+Use `review-media` after a rendered or exported media file exists. Use `eval` after planning or QC artifacts exist. For quickstart outputs, evaluate `KINO-REVIEW.json`, `KINO-FRAME-QC.json`, `KINO-AUDIO-QC.json`, and `KINO-VALIDATION.json`. For planning workflows, include `KINO-PLAN.json` and `KINO-CAPTIONS.json` when present.
 
 If a documented helper is not present in `kino --help`, mark it as a docs recommendation or future command instead of assuming runtime support.
 
@@ -78,7 +79,8 @@ Primary commands:
 
 - `plan-edit`, `validate-plan`, and `apply-plan`: create, validate, and import `KINO-PLAN.json` proposed beats.
 - `plan-captions`, `validate-captions`, and `render-captions`: create, validate, and burn in `KINO-CAPTIONS.json`.
-- `eval`: aggregate plan, caption, frame, audio, and export reports into `KINO-EVAL.json`.
+- `review-media`: inspect an actual media file and write `KINO-REVIEW.json` plus optional Markdown/contact-sheet artifacts.
+- `eval`: aggregate plan, caption, media review, frame, audio, and export reports into `KINO-EVAL.json`.
 - `init-edit`: create `KINO-EDIT.json` from transcript JSON.
 - `propose-beat`, `approve-beat`, `reject-beat`, and `compile-manifest`: maintain planning state and compile approved beats to `KINO-MANIFEST.json`.
 - `validate-manifest`: parse and check `KINO-MANIFEST.json`.

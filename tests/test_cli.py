@@ -63,6 +63,7 @@ def test_help_exposes_phase_1_commands(capsys):
         "plan-captions",
         "validate-captions",
         "render-captions",
+        "review-media",
         "eval",
         "probe-media",
         "analyze-audio",
@@ -243,6 +244,7 @@ def test_eval_cli_aggregates_artifacts_and_strict_mode(tmp_path, capsys):
     frame_qc = tmp_path / "KINO-FRAME-QC.json"
     audio_qc = tmp_path / "KINO-AUDIO-QC.json"
     validation = tmp_path / "KINO-VALIDATION.json"
+    review = tmp_path / "KINO-REVIEW.json"
     eval_json = tmp_path / "KINO-EVAL.json"
     eval_md = tmp_path / "KINO-EVAL.md"
     transcript.write_text(
@@ -288,6 +290,29 @@ def test_eval_cli_aggregates_artifacts_and_strict_mode(tmp_path, capsys):
             }
         )
     )
+    review.write_text(
+        json.dumps(
+            {
+                "version": 1,
+                "schema": "kino.review.v1",
+                "id": "review001",
+                "media": "out.mp4",
+                "overall": "pass",
+                "recommendations": [],
+                "artifacts": [],
+                "checks": [
+                    {
+                        "name": "media_duration",
+                        "category": "media",
+                        "status": "pass",
+                        "expected": "duration > 0s",
+                        "observed": "3s",
+                        "message": "Media duration is available.",
+                    }
+                ],
+            }
+        )
+    )
 
     assert cli.main(["init-edit", str(transcript), str(edit), "--id", "edit001"]) == 0
     assert cli.main(["plan-edit", str(edit), str(plan), "--archetype", "social-short"]) == 0
@@ -302,6 +327,8 @@ def test_eval_cli_aggregates_artifacts_and_strict_mode(tmp_path, capsys):
         str(plan),
         "--captions",
         str(captions),
+        "--review",
+        str(review),
         "--frame-qc",
         str(frame_qc),
         "--audio-qc",
